@@ -1,0 +1,44 @@
+/*!
+ * PhilViz Custom CSS
+ * @author: Daisy Luo and Tom Jin
+ */
+
+/* --- Custom Global Styles --- */
+.cfont {
+	font-family: 'Rokkitt', cursive;
+	font-size: 26px !important;
+}
+
+.clight {
+	color: #FFF !important;
+}
+
+.cright {
+	float: right;
+}
+
+/* --- Navbar Styles --- */
+.navbar-nav a:hover {
+	background-color: #DF0390 !important;
+}
+
+.navbar-secondary {
+	display:none;
+	margin-top:50px;
+	background-color: #DF0390 !important;
+	border-color: #DF0390 !important;
+	opacity:0.9;
+}
+
+.navbar-secondary a {
+	color: #FFF !important;
+}
+
+.navbar-secondary a:hover {
+	background-color: #F55FA5 !important;
+}
+
+/* --- Container Styles --- */
+.content-container {
+	margin-top: 50px;
+}
