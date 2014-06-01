@@ -38,6 +38,17 @@
 		return result;
 	}
 	
+	function determineTreeWidth(data, parentID, width) {
+		if (data) {
+			var width = 0;
+			$.each(data, function( index, value ) {
+				
+			});
+		} else {
+			return 0;
+		}
+	}
+	
 	function OrgNode(info, children) {
 		this.info = info;
 		this.children = (children && children.length) ? children : [];
@@ -69,6 +80,7 @@
 				coldir = coldir || "center";
 				var y_offset = (rowdir === "top") ? 0 : (rowdir === "bottom") ? 1 : 0.5;
 				var x_offset = (coldir === "left") ? 0 : (coldir === "right") ? 1 : 0.5;
+				
 				return {
 					x : bx + bw * x_offset,
 					y : by + bh * y_offset
@@ -87,8 +99,9 @@
 			maxFz : 14,
 			minHgap : 2,
 			minVgap : 4,
-			width : 960,
-			height : 480,
+			rawDatas: null,
+			width : 0,
+			height : 0,
 			isVert : function(level, info, node) {
 				return level > 3000;
 			},
@@ -125,16 +138,36 @@
 					console.log("nodeclick");
 					slf._trigger("nodeclick", null, info, node);
 				});
+				
+				if (node.children.length > 0) {
+					var reasonCell = slf._paper.singleBox({
+						cx : center.x,
+						cy : center.y + 50,
+						text : "Reason",
+						color : "#EBEBED",
+						fz : 10
+					});
+				}
 			}
 		},
 		
 		_create: function () {
 			var slf = this, dom = slf.element.get(0), ops = slf.options;
+			
+			var root = slf._buildTree(ops.rawDatas, null);
+			console.log(root);
+			var treeWidth = slf._determineTreeWidth(root);
+			var treeHeight = slf._determineTreeHeight(root);
+			console.log(treeWidth);
+			console.log(treeHeight);
+			ops.width = treeWidth * 200;
+			ops.height = treeHeight * 200
+			
 			slf._paper = Raphael(dom, ops.width, ops.height);
 			// Use pan, zoom effects
-			var panZoom = slf._paper.panzoom({ initialZoom: 6, initialPosition: { x: 120, y: 70} });
+			var panZoom = slf._paper.panzoom({ initialZoom: 0, initialPosition: { x: 120, y: 70} });
 			panZoom.enable();
-    		slf._paper.safari();	
+    		slf._paper.safari();
 		},
 		
 		_init : function() {
@@ -216,6 +249,42 @@
 			return result;
 		},
 		
+		_determineTreeWidth : function(root) {
+			var slf = this;
+			if (!root) {
+				return 0;
+			} else if (root.children.length <= 0) {
+				return 0;
+			} else {
+				var childLengths = root.children.length;
+				$.each(root.children, function(i, value) {
+					childLengths += slf._determineTreeWidth(value);
+				});
+				return childLengths;
+			}
+		},
+		
+		_determineTreeHeight : function(root) {
+			var slf = this;
+			var h = 0;
+			if (!root) {
+				return 0;
+			} else if (root.children.length <= 0) {
+				return 1;
+			} else {
+				h++;
+				var highest = 0;
+				$.each(root.children, function(i, value) {
+					var tmp = Math.max(slf._determineTreeHeight(root.children[i]));
+					if (tmp > highest) {
+						highest = tmp; 
+					}
+				});
+				h += highest;
+			}
+			return h;
+		},
+		
 		_preRows : function(node, level) {
 			var slf = this, children = node.children, vgroup = slf.vgroup, vems = slf.vems;
 			var ops = slf.options;
@@ -246,7 +315,6 @@
 		_preColumns : function(node, parent) {
 			var slf = this, ops = slf.options, children = node.children;
 			var hem = node._hem = slf._calcEm(node, false);
-			// var hem = node._hem = 1;
 			
 			node._hem_clds = [];
 			
@@ -320,6 +388,7 @@
 			}
 			
 			var bbox = node._bbox = new OrgBox(x, _vpos.y, width, _vpos.height);
+			//console.log("x: " + x, "; y: " + _vpos.y, "; width: " + width, "; height: " + _vpos.height);
 			
 			var cellx, celly, cellw = node._hem * fz, cellh = node._vem * fz;
 			var vert = ops.isVert.call(slf, level, node.info, node);
@@ -345,7 +414,7 @@
 		_draw : function(node, parent) {
 			var slf = this;
 			var bbox = node._bbox, cbox = node._cbox, children = node.children, clen = children.length;
-			console.log(node);
+			//console.log(node);
 			if(!node.isRoot()) {
 				slf._drawLine(bbox.center("top"), cbox.center("top"));
 			}

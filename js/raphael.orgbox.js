@@ -178,6 +178,7 @@
 			});
 		} else {
 			rect_w = pref_len * fz;
+			rect_w = 200;
 			rect_h = lh * fz;
 			vl_rect = paper.unirect({
 				x : cx - 0.5 * rect_w,

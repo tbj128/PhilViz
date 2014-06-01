@@ -76,8 +76,8 @@
 
 
 
-		<div id="chart-content" class="content-container">
-			<div id="chart" style="width: 960px; height: 600px;margin: 0 auto;">
+		<div id="chart-content" class="content-container" style="height:100%;position:relative;overflow:hidden;">
+			<div id="chart" style="width: 100%; margin: 0px;">
 			</div>
 		</div><!-- /.container -->
 		
@@ -103,7 +103,7 @@
 				var _datas = [{
 					id : "100001",
 					name : "P4",
-					value : "Infringing person's right to life may be done only competing right: is someone else's right to control own body",
+					value : "Infringing person's right to life may be done only competing right: <br />is someone else's right to control own body",
 					color : _colors["blue"],
 					pid : null
 				}, {
@@ -223,10 +223,18 @@
 				
 				var show_editbar = false;
 				var $editbar = $("#editbar");
+				var $chart_wrapper = $("#chart-content");
+				$chart_wrapper.height($(window).height() - 50);
+				
+				
+				// TODO: set the width and height to be 100% in the style component of the svg
+				// TODO: drag amount should differ depending on the zoom level
+				// TODO: 
 				var $chart = $("#chart");
 				$chart.orgchart({
-					width : $(window).width(),
-					height : 600,
+					width : 1000,
+					height : 1000,
+					rawDatas : _datas,
 					nodeclick : function(evt, info, node) {
 						console.log(info);
 						// console.log(this);
@@ -234,11 +242,15 @@
 						show_editbar = true;
 					}
 				});
-	
+				
 				$chart.orgchart("draw", _datas);
+				$chart.width($(window).width());
+				$chart.height($(window).height() - 50);
+				
+				$chart_wrapper.width($(window).width());
+				$chart_wrapper.height($(window).height() - 50);
 				
 				$(document).click(function() {
-					console.log("asdf");
 					if (!show_editbar) {
 						$editbar.hide();
 					} else {
