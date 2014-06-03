@@ -31,6 +31,20 @@
 		return len - 0.5 * halfs;
 	}
 	
+	function wrapText(t, content, maxWidth) {
+		var words = content.split(" ");
+		var tempText = "";
+		for (var i=0; i<words.length; i++) {
+		  t.attr("text", tempText + " " + words[i]);
+		  if (t.getBBox().width > maxWidth) {
+			tempText += "\n" + words[i];
+		  } else {
+			tempText += " " + words[i];
+		  }
+		}
+		t.attr("text", tempText.substring(1));
+	}
+	
 	function isVtextSupport(paper) {
 		var result = paper._v_txt_spt;
 		if(typeof result === "undefined") {
@@ -43,7 +57,10 @@
 	
 	Raphael.fn.htext = function (options) {
 		var ops = $.extend({}, Raphael.fn.htext.defaults, options || {});
-		return this.text(ops.x, ops.y, ops.text).attr({"font-size": ops.fz, "fill": ops.color});
+		var text = this.text(ops.x, ops.y, ops.text);
+		text.attr({"font-size": ops.fz, "fill": ops.color});
+		wrapText(text, ops.text, 320);
+		return text;
 	};
 	
 	Raphael.fn.htext.defaults = {
@@ -149,7 +166,7 @@
 			rect_w = lh * fz;
 			nm_rect = paper.unirect({
 				x : cx - rect_w,
-				y : cy - 0.5 * rect_h,
+				y : cy - 0.75 * rect_h,
 				width : rect_w,
 				height : rect_h,
 				color : color
@@ -164,7 +181,7 @@
 			});
 			vl_rect = paper.unirect({
 				x : cx,
-				y : cy - 0.5 * rect_h,
+				y : cy - 0.75 * rect_h,
 				width : rect_w,
 				height : rect_h
 			});
@@ -178,11 +195,12 @@
 			});
 		} else {
 			rect_w = pref_len * fz;
-			rect_w = 200;
+			rect_w = 360;
 			rect_h = lh * fz;
+			rect_h = 60;
 			vl_rect = paper.unirect({
 				x : cx - 0.5 * rect_w,
-				y : cy - rect_h,
+				y : cy - rect_h * 0.35, // TODO
 				width : rect_w,
 				height : rect_h,
 				color : color
@@ -203,9 +221,9 @@
 			});
 			vl_txt = paper.unitext({
 				x : cx,
-				y : cy + 0.5 * lh  * fz,
+				y : cy + 0.5 * lh  * fz + 10,
 				text : text2,
-				fz : fz,
+				fz : fz + 4,
 				color : color,
 				vertical : false
 			});

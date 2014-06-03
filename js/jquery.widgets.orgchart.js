@@ -140,13 +140,21 @@
 				});
 				
 				if (node.children.length > 0) {
+					// Draws the 'Reason' box
 					var reasonCell = slf._paper.singleBox({
 						cx : center.x,
-						cy : center.y + 50,
+						cy : center.y + 100,
 						text : "Reason",
 						color : "#EBEBED",
 						fz : 10
 					});
+					
+					// Draws the arrow
+					var pArrowCenter = {x: center.x, y: center.y + 60};
+					var pArrowLeft = {x: center.x - 10, y: center.y + 70};
+					var pArrowRight = {x: center.x + 10, y: center.y + 70};
+					slf._drawLine(pArrowCenter, pArrowRight);
+					slf._drawLine(pArrowCenter, pArrowLeft);
 				}
 			}
 		},
@@ -160,7 +168,7 @@
 			var treeHeight = slf._determineTreeHeight(root);
 			console.log(treeWidth);
 			console.log(treeHeight);
-			ops.width = treeWidth * 200;
+			ops.width = treeWidth * 320;
 			ops.height = treeHeight * 200
 			
 			slf._paper = Raphael(dom, ops.width, ops.height);
@@ -357,6 +365,7 @@
 			var vpos = slf._vpos, vstart = 0, vh = 0;
 			for(var j = 1; j <= rows; j ++) {
 				vh = vems[j] * fz + vgap;
+				vh = 200; // TODO
 				vpos[j] = {
 					y : vstart,
 					height : vh
@@ -388,9 +397,11 @@
 			}
 			
 			var bbox = node._bbox = new OrgBox(x, _vpos.y, width, _vpos.height);
+			
 			//console.log("x: " + x, "; y: " + _vpos.y, "; width: " + width, "; height: " + _vpos.height);
 			
 			var cellx, celly, cellw = node._hem * fz, cellh = node._vem * fz;
+			//cellh = 200; // TODO
 			var vert = ops.isVert.call(slf, level, node.info, node);
 			if(vert) {
 				var top = bbox.center("top");
@@ -443,7 +454,7 @@
 		
 		_drawLine : function(p1, p2) {
 			var line = "M" + p1.x + "," + p1.y + "L" + p2.x + "," + p2.y + "Z";
-			this._paper.path(line).attr({"stroke-width" : 0.2});
+			this._paper.path(line).attr({"stroke-width" : 1}).toBack();
 		},
 		
 		clear : function() {

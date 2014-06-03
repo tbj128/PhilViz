@@ -132,8 +132,8 @@
                     newHeight = paper.height * (1 - (me.currZoom * settings.zoomStep)),
                     newPoint = getRelativePosition(evt, container);
     
-                deltaX = (newWidth * (newPoint.x - initialPos.x) / paper.width) * -1;
-                deltaY = (newHeight * (newPoint.y - initialPos.y) / paper.height) * -1;
+                deltaX = (newWidth * (newPoint.x - initialPos.x) / paper.width) * -1 * 3;
+                deltaY = (newHeight * (newPoint.y - initialPos.y) / paper.height) * -1 * 3;
                 initialPos = newPoint;
     
                 repaint();

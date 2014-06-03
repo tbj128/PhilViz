@@ -43,7 +43,7 @@
 							<a href="../css">Save</a>
 						</li>
 						<li>
-							<a href="../components">Print</a>
+							<a id="btn-print" href="javascript:void(0);">Print</a>
 						</li>
 					</ul>
 					<ul class="nav navbar-nav navbar-right">
@@ -226,10 +226,6 @@
 				var $chart_wrapper = $("#chart-content");
 				$chart_wrapper.height($(window).height() - 50);
 				
-				
-				// TODO: set the width and height to be 100% in the style component of the svg
-				// TODO: drag amount should differ depending on the zoom level
-				// TODO: 
 				var $chart = $("#chart");
 				$chart.orgchart({
 					width : 1000,
@@ -258,6 +254,20 @@
 						show_editbar = false;
 					}
 				});
+				
+				$('#btn-print').click(function() {
+					var container = $('#chart');
+					var svgImg = $('#chart svg');
+					var width = svgImg.width();
+					var height = svgImg.height();
+					var printWindow = window.open('', 'PrintMap',
+					'width=' + width + ',height=' + height);
+					printWindow.document.writeln($(container).html());
+					printWindow.document.close();
+					//printWindow.print();
+					//printWindow.close();
+				});
+				
 			});
 		</script>
 	</body>
