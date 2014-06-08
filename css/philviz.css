@@ -27,7 +27,7 @@
 	margin-top:50px;
 	background-color: #DF0390 !important;
 	border-color: #DF0390 !important;
-	opacity:0.9;
+	opacity:0;
 }
 
 .navbar-secondary a {
@@ -43,7 +43,105 @@
 	margin-top: 50px;
 }
 
-#chart svg {
+svg {
 	width: 100%;
 	height: 100%;
+}
+
+/* --- Edit Box Styles --- */
+.blackout {
+	display:none;
+	width: 100%;
+	height: 100%;
+	position:fixed;
+	left: 0px;
+	right: 0px;
+	top: 0px;
+	bottom: 0px;
+	z-index:9997;
+	background-color: #FFF;
+	/* IE 8 */
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
+
+	/* IE 5-7 */
+	filter: alpha(opacity=80);
+
+	/* Netscape */
+	-moz-opacity: 0.8;
+
+	/* Safari 1.x */
+	-khtml-opacity: 0.8;
+
+	/* Good browsers */
+	opacity: 0.8;
+}
+
+.editbox {
+	display:none;
+	border-radius: 12px;
+	background:#FFF;
+	border:1px solid #BBB;
+	width: 500px;
+	height: 240px;
+	position:fixed;
+	top: 36px;
+	left: 50%;
+	margin-left: -250px;
+	z-index: 9998;
+}
+
+.editbox-head {
+	border-radius: 12px 12px 0 0;
+	width: 100%;
+	height: 50px;
+	background-color: #04BADD;
+	color: #FFF;
+	padding: 8px 0 0 16px;
+}
+
+.editbox-body {
+	border-radius: 0 0 12px 12px;
+	width: 100%;
+	color: #999;
+	padding: 16px;
+}
+
+.editbox-body p {
+	margin-top: 6px;
+}
+
+.box-shadow {
+	-webkit-box-shadow: 0 0 12px rgba(0, 0, 0, 0.3);
+	-moz-box-shadow: 0 0 12px rgba(0,0,0,.3);
+	box-shadow: 0 0 12px rgba(0, 0, 0, 0.3);
+}
+
+.box-close-btn {
+	border-color: #DDD;
+	color: #333;
+	text-shadow: 0 1px 0 #F3F3F3;
+	right: -11px;
+	position: absolute;
+	top: -11px;
+	margin: 0;
+	z-index: 9999;
+	padding: 0;
+	width: 1.75em;
+	height: 1.75em;
+	text-indent: -9999px;
+	white-space: nowrap!important;
+	text-align: center;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	cursor: pointer;
+	background-color: rgba(0, 0, 0, 0.6);
+	background-position: center center;
+	background-repeat: no-repeat;
+	-webkit-border-radius: 1em;
+	border-radius: 1em;
+	background-image: url("data:image/svg+xml;charset=US-ASCII,%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22iso-8859-1%22%3F%3E%3C!DOCTYPE%20svg%20PUBLIC%20%22-%2F%2FW3C%2F%2FDTD%20SVG%201.1%2F%2FEN%22%20%22http%3A%2F%2Fwww.w3.org%2FGraphics%2FSVG%2F1.1%2FDTD%2Fsvg11.dtd%22%3E%3Csvg%20version%3D%221.1%22%20id%3D%22Layer_1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%20x%3D%220px%22%20y%3D%220px%22%20%20width%3D%2214px%22%20height%3D%2214px%22%20viewBox%3D%220%200%2014%2014%22%20style%3D%22enable-background%3Anew%200%200%2014%2014%3B%22%20xml%3Aspace%3D%22preserve%22%3E%3Cpolygon%20fill%3D%22%23FFF%22%20points%3D%2214%2C3%2011%2C0%207%2C4%203%2C0%200%2C3%204%2C7%200%2C11%203%2C14%207%2C10%2011%2C14%2014%2C11%2010%2C7%20%22%2F%3E%3Cg%3E%3C%2Fg%3E%3Cg%3E%3C%2Fg%3E%3Cg%3E%3C%2Fg%3E%3Cg%3E%3C%2Fg%3E%3Cg%3E%3C%2Fg%3E%3Cg%3E%3C%2Fg%3E%3Cg%3E%3C%2Fg%3E%3Cg%3E%3C%2Fg%3E%3Cg%3E%3C%2Fg%3E%3Cg%3E%3C%2Fg%3E%3Cg%3E%3C%2Fg%3E%3Cg%3E%3C%2Fg%3E%3Cg%3E%3C%2Fg%3E%3Cg%3E%3C%2Fg%3E%3Cg%3E%3C%2Fg%3E%3C%2Fsvg%3E");
+}
+
+.box-close-btn:hover {	
+	background-color: rgba(0, 0, 0, 0.3);
 }

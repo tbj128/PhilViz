@@ -8,7 +8,8 @@
  * </ul>
  * 
  * @requires Raphael.js 2.1.0, jquery.js 1.5+
- * @author LiuLongbiao
+ * @author: LiuLongbiao
+ * @modified: Tom Jin / June 2014
  * 
  */
 ;(function(Raphael, $, String, undefined) {
@@ -31,15 +32,22 @@
 		return len - 0.5 * halfs;
 	}
 	
-	function wrapText(t, content, maxWidth) {
+	function wrapText(t, content, maxLines, maxWidth) {
 		var words = content.split(" ");
 		var tempText = "";
+		var lineCount = 1;
 		for (var i=0; i<words.length; i++) {
 		  t.attr("text", tempText + " " + words[i]);
 		  if (t.getBBox().width > maxWidth) {
 			tempText += "\n" + words[i];
+			lineCount++;
 		  } else {
 			tempText += " " + words[i];
+		  }
+		  
+		  if (lineCount > maxLines) {
+		  	tempText += "..."
+		  	break;
 		  }
 		}
 		t.attr("text", tempText.substring(1));
@@ -59,7 +67,7 @@
 		var ops = $.extend({}, Raphael.fn.htext.defaults, options || {});
 		var text = this.text(ops.x, ops.y, ops.text);
 		text.attr({"font-size": ops.fz, "fill": ops.color});
-		wrapText(text, ops.text, 320);
+		wrapText(text, ops.text, 2, 320);
 		return text;
 	};
 	
@@ -137,7 +145,7 @@
 		var ops = $.extend({}, Raphael.fn.unirect.defaults, options || {});
 		var re = this.rect(ops.x, ops.y, ops.width, ops.height, ops.r);
 		re.mouseover(function () {
-			console.log(this);
+			//console.log(this);
     	});
 		re.attr({fill : ops.color, "stroke-width" : 0.5});
 		return re;
@@ -221,7 +229,7 @@
 			});
 			vl_txt = paper.unitext({
 				x : cx,
-				y : cy + 0.5 * lh  * fz + 10,
+				y : cy + 0.5 * lh  * fz + 20,
 				text : text2,
 				fz : fz + 4,
 				color : color,

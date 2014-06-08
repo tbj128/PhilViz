@@ -12,6 +12,7 @@
 ;(function($, Raphael, Math, String, undefined){
 	
 	var _max = Math.max, _min = Math.min, _floor = Math.floor;
+	var zoom = -1, pos;
 	
 	function isHalfEm(ch) {
 		return (/^[0-9a-z\(\)\.]$/g).test(ch);
@@ -31,7 +32,9 @@
 	}
 	
 	function _randomHex2() {
-		var result = (Math.floor(0xFF * Math.random())).toString(16);
+		var result = (Math.floor(0xFF * 0.1392)).toString(16);
+		
+		//var result = (Math.floor(0xFF * Math.random())).toString(16);
 		if(result.length === 1) {
 			result = "0" + result;
 		}
@@ -102,6 +105,15 @@
 			rawDatas: null,
 			width : 0,
 			height : 0,
+			print : false,
+			printX : 0,
+			printXTot : 0,
+			printY : 0,
+			printYTot : 0,
+			customPos : false,
+			initZoom : 0,
+			initPos : {},
+			
 			isVert : function(level, info, node) {
 				return level > 3000;
 			},
@@ -135,7 +147,6 @@
 					vertical : vert
 				});
 				cell.click(function() {
-					console.log("nodeclick");
 					slf._trigger("nodeclick", null, info, node);
 				});
 				
@@ -159,6 +170,14 @@
 			}
 		},
 		
+		getZoom: function() {
+			return this._panZoom.getCurrentZoom();
+		},
+		
+		getPosition: function() {
+			return this._panZoom.getCurrentPosition();
+		},
+		
 		_create: function () {
 			var slf = this, dom = slf.element.get(0), ops = slf.options;
 			
@@ -169,13 +188,30 @@
 			console.log(treeWidth);
 			console.log(treeHeight);
 			ops.width = treeWidth * 320;
-			ops.height = treeHeight * 200
+			ops.height = treeHeight * 200;
 			
-			slf._paper = Raphael(dom, ops.width, ops.height);
-			// Use pan, zoom effects
-			var panZoom = slf._paper.panzoom({ initialZoom: 0, initialPosition: { x: 120, y: 70} });
-			panZoom.enable();
-    		slf._paper.safari();
+			if (ops.print) {
+    			// Print mode
+				slf._paper = Raphael(dom, ops.width, ops.height);
+				slf._panZoom = slf._paper.panzoom({ initialZoom: 0, initialPosition: { x: 120, y: 70} });
+				slf._paper.setViewBox(ops.printX * (ops.width / ops.printXTot), ops.printY * (ops.height / ops.printYTot), ops.width / ops.printXTot, ops.height / ops.printYTot, false);
+    		} else if (ops.customPos) {
+    			// Custom start position mode
+				slf._paper = Raphael(dom, ops.width, ops.height);
+				// Use pan, zoom effects
+				slf._panZoom = slf._paper.panzoom({ initialZoom: ops.initZoom, initialPosition: ops.initPos });
+				
+				slf._panZoom.enable();
+    			slf._paper.safari();
+    		} else {
+				// Default mode
+				slf._paper = Raphael(dom, ops.width, ops.height);
+				// Use pan, zoom effects
+				slf._panZoom = slf._paper.panzoom({ initialZoom: 0, initialPosition: { x: 120, y: 70} });
+				
+				slf._panZoom.enable();
+    			slf._paper.safari();
+			}
 		},
 		
 		_init : function() {
@@ -185,7 +221,7 @@
 				"height" : h
 			});
 			slf._paper.setSize(w, h);
-			slf.draw([]);
+			slf.draw([]);	
 		},
 		
 		draw : function(datas, rootid) {
@@ -454,7 +490,8 @@
 		
 		_drawLine : function(p1, p2) {
 			var line = "M" + p1.x + "," + p1.y + "L" + p2.x + "," + p2.y + "Z";
-			this._paper.path(line).attr({"stroke-width" : 1}).toBack();
+			this._paper.path(line).attr({"stroke-width" : 4}).toBack();
+			// TODO: Potential Chrome bug where printing svg element path that has no z component becomes blank
 		},
 		
 		clear : function() {

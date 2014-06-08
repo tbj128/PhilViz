@@ -23,6 +23,23 @@
 		<![endif]-->
 	</head>
 	<body>
+	
+		<div id="blackout" class="blackout"></div>
+		<div id="editbox" class="editbox box-shadow">
+			<a href="#" id="edit-close" class="box-close-btn">Close</a>
+			<div class="editbox-head cfont">
+				Edit Node
+			</div>
+			<div class="editbox-body">
+				<textarea placeholder="Write the contents of the node..." id="edit-text" class="form-control" rows="5"></textarea>
+				<p>
+					<button id="edit-save" type="button" class="btn btn-success">Save</button>
+					<button id="edit-cancel" type="button" class="btn btn-primary">Cancel</button>
+				</p>
+			</div>
+		</div>
+
+	
 		<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
 			<div class="container">
 				<div class="navbar-header">
@@ -58,10 +75,7 @@
 				<nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
 					<ul class="nav navbar-nav">
 						<li>
-							<a href="#"><i class="glyphicon glyphicon-edit"></i> Edit Node</a>
-						</li>
-						<li>
-							<a href="#"><i class="glyphicon glyphicon-plus"></i> Add Parent Node</a>
+							<a id="nav-edit-edit" href="#"><i class="glyphicon glyphicon-edit"></i> Edit Node</a>
 						</li>
 						<li>
 							<a href="#"><i class="glyphicon glyphicon-plus"></i> Add Child Node</a>
@@ -73,13 +87,18 @@
 				</nav>
 			</div>
 		</div>
-
-
-
+		
 		<div id="chart-content" class="content-container" style="height:100%;position:relative;overflow:hidden;">
 			<div id="chart" style="width: 100%; margin: 0px;">
 			</div>
 		</div><!-- /.container -->
+		
+		<div id="chart-canvas-container">
+			<canvas id="canvas" width="1000px" height="600px"></canvas> 
+		</div>
+		<div id="chart-png-container">
+		</div>
+		
 		
 		<!-- Required JS Scripts -->
 		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
@@ -88,6 +107,12 @@
 		<script src="js/raphael.orgbox.js"></script>
 		<script src="js/jquery.widgets.orgchart.js"></script>
 		<script src="js/raphael.pan-zoom.js"></script>
+		<script type="text/javascript" src="http://canvg.googlecode.com/svn/trunk/rgbcolor.js"></script> 
+		<script type="text/javascript" src="http://canvg.googlecode.com/svn/trunk/StackBlur.js"></script>
+		<script type="text/javascript" src="http://canvg.googlecode.com/svn/trunk/canvg.js"></script> 
+		<script src="js/canvas2image.js"></script>
+		<script src="js/base64.js"></script>
+		
 		<script type="text/javascript">
 			$(function(exports) {
 				var _colors = {
@@ -220,11 +245,10 @@
 					pid : "100013"
 				}];
 	
-				
+				var editing_info, editing_zoom, editing_pos;
 				var show_editbar = false;
 				var $editbar = $("#editbar");
 				var $chart_wrapper = $("#chart-content");
-				$chart_wrapper.height($(window).height() - 50);
 				
 				var $chart = $("#chart");
 				$chart.orgchart({
@@ -232,10 +256,10 @@
 					height : 1000,
 					rawDatas : _datas,
 					nodeclick : function(evt, info, node) {
-						console.log(info);
-						// console.log(this);
-						console.log(evt);
 						show_editbar = true;
+						editing_info = info;
+						editing_zoom = $chart.data("orgchart").getZoom();
+						editing_pos = $chart.data("orgchart").getPosition();
 					}
 				});
 				
@@ -248,10 +272,16 @@
 				
 				$(document).click(function() {
 					if (!show_editbar) {
+						$editbar.fadeTo(100, 0, function() {
+							// Animation complete.
+						});
 						$editbar.hide();
 					} else {
-						$editbar.show();
 						show_editbar = false;
+						$editbar.fadeTo(150, 0.9, function() {
+							// Animation complete.
+						});
+						$editbar.show();
 					}
 				});
 				
@@ -260,14 +290,97 @@
 					var svgImg = $('#chart svg');
 					var width = svgImg.width();
 					var height = svgImg.height();
-					var printWindow = window.open('', 'PrintMap',
-					'width=' + width + ',height=' + height);
-					printWindow.document.writeln($(container).html());
-					printWindow.document.close();
-					//printWindow.print();
-					//printWindow.close();
+					if (width > 2550) {
+						width = 2550;
+						height = height / (width / 2550);
+						container.width(width);
+						container.height(height);
+						svgImg.width(width);
+						svgImg.height(height);
+					}
+					
+					canvg('canvas', container.html());
+					var canvas = document.getElementById("canvas")
+					var imgPNG = Canvas2Image.saveAsPNG(canvas, true)
+					$('#chart-png-container').html(imgPNG);
+					
+ 					//var printWindow = window.open('', 'PrintMap', 'width=' + width + ',height=' + height);
+
+					var myWindow = window.open('','','width=500,height=500');
+					myWindow.document.write("<html><body onload='print();'><p>This is 'myWindow'</p>");
+					myWindow.document.write(imgPNG.attr('src') + "</body></html>");
+
 				});
 				
+				// --- Edit Navbar Click Handlers ---
+				$('#nav-edit-edit').click(function() {
+					if (editing_info) {
+						$('#edit-text').val(editing_info.value);
+					} else {
+						$('#edit-text').val("");
+					}
+					$('#editbox').show();
+					$('#blackout').show();
+				});
+				
+				// --- EditBox Button Click Handlers ---
+				$('#edit-save').click(function() {					
+					for (var i = 0; i < _datas.length; i++) {
+						if (_datas[i].id === editing_info.id) {
+							_datas[i].value = $('#edit-text').val();
+							break;
+						}
+					}
+					
+					// Redraws 
+					$chart.data('orgchart').destory();
+					$chart.orgchart({
+						width : 1000,
+						height : 1000,
+						rawDatas : _datas,
+						customPos : true,
+						initZoom : editing_zoom,
+						initPos : editing_pos,
+						nodeclick : function(evt, info, node) {
+							show_editbar = true;
+							editing_info = info;
+							editing_zoom = $chart.data("orgchart").getZoom();
+							editing_pos = $chart.data("orgchart").getPosition();
+						}
+					});
+				
+					$chart.orgchart("draw", _datas);
+					$chart.width($(window).width());
+					$chart.height($(window).height() - 50);
+					
+					// Hides Box
+					$('#editbox').hide();
+					$('#blackout').hide();
+				});
+				$('#edit-close').click(function(e) {
+					if ($('#edit-text').val() !== editing_info.value) {
+						e.preventDefault();
+						if (window.confirm("Are you sure you want to cancel? You will lose all your edits.")) {
+							$('#editbox').hide();
+							$('#blackout').hide();
+						}
+					} else {
+						$('#editbox').hide();
+						$('#blackout').hide();
+					}
+				});
+				$('#edit-cancel').click(function(e) {
+					if ($('#edit-text').val() !== editing_info.value) {
+						e.preventDefault();
+						if (window.confirm("Are you sure you want to cancel? You will lose all your edits.")) {
+							$('#editbox').hide();
+							$('#blackout').hide();
+						}
+					} else {
+						$('#editbox').hide();
+						$('#blackout').hide();
+					}
+				});
 			});
 		</script>
 	</body>
