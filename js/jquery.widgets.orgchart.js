@@ -32,9 +32,9 @@
 	}
 	
 	function _randomHex2() {
-		var result = (Math.floor(0xFF * 0.1392)).toString(16);
+		// var result = (Math.floor(0xFF * 0.1392)).toString(16);
 		
-		//var result = (Math.floor(0xFF * Math.random())).toString(16);
+		var result = (Math.floor(0xFF * Math.random())).toString(16);
 		if(result.length === 1) {
 			result = "0" + result;
 		}
@@ -161,9 +161,9 @@
 					});
 					
 					// Draws the arrow
-					var pArrowCenter = {x: center.x, y: center.y + 60};
-					var pArrowLeft = {x: center.x - 10, y: center.y + 70};
-					var pArrowRight = {x: center.x + 10, y: center.y + 70};
+					var pArrowCenter = {x: center.x, y: center.y + 55};
+					var pArrowLeft = {x: center.x - 10, y: center.y + 65};
+					var pArrowRight = {x: center.x + 10, y: center.y + 65};
 					slf._drawLine(pArrowCenter, pArrowRight);
 					slf._drawLine(pArrowCenter, pArrowLeft);
 				}
@@ -521,7 +521,8 @@
 		},
 		
 		_randomColor : function() {
-			return "#" + _randomHex2() + _randomHex2() + _randomHex2();
+			return "#00BEE8";
+			// return "#" + _randomHex2() + _randomHex2() + _randomHex2();
 		},
 		
 		destory : function() {

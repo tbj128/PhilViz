@@ -48,6 +48,10 @@ svg {
 	height: 100%;
 }
 
+svg rect[width="360"], svg text[fill="#00bee8"] {
+	cursor: pointer;
+}
+
 /* --- Edit Box Styles --- */
 .blackout {
 	display:none;

@@ -205,31 +205,31 @@
 			rect_w = pref_len * fz;
 			rect_w = 360;
 			rect_h = lh * fz;
-			rect_h = 60;
+			rect_h = 64;
 			vl_rect = paper.unirect({
 				x : cx - 0.5 * rect_w,
-				y : cy - rect_h * 0.35, // TODO
+				y : cy - rect_h * 0.35 - 10, // TODO
 				width : rect_w,
 				height : rect_h,
 				color : color
 			});
-			nm_txt = paper.unitext({
-				x : cx,
-				y : cy - 0.5 * lh  * fz,
-				text : text1,
-				fz : fz,
-				color : _white,
-				vertical : false
-			});
+// 			nm_txt = paper.unitext({
+// 				x : cx,
+// 				y : cy - 0.5 * lh  * fz,
+// 				text : text1,
+// 				fz : fz,
+// 				color : _white,
+// 				vertical : false
+// 			});
 			vl_rect = paper.unirect({
 				x : cx - 0.5 * rect_w,
-				y : cy,
+				y : cy - 20,
 				width : rect_w,
-				height : rect_h
+				height : rect_h + 10
 			});
 			vl_txt = paper.unitext({
 				x : cx,
-				y : cy + 0.5 * lh  * fz + 20,
+				y : cy + 0.5 * lh  * fz + 10,
 				text : text2,
 				fz : fz + 4,
 				color : color,
