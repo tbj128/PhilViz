@@ -38,6 +38,19 @@
 				</p>
 			</div>
 		</div>
+		<div id="addbox" class="addbox box-shadow">
+			<a href="#" id="add-close" class="box-close-btn">Close</a>
+			<div class="addbox-head cfont">
+				Add Node
+			</div>
+			<div class="addbox-body">
+				<textarea placeholder="Write the contents of the node..." id="add-text" class="form-control" rows="5"></textarea>
+				<p>
+					<button id="add-save" type="button" class="btn btn-success">Save</button>
+					<button id="add-cancel" type="button" class="btn btn-primary">Cancel</button>
+				</p>
+			</div>
+		</div>
 
 	
 		<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
@@ -78,10 +91,10 @@
 							<a id="nav-edit-edit" href="#"><i class="glyphicon glyphicon-edit"></i> Edit Node</a>
 						</li>
 						<li>
-							<a href="#"><i class="glyphicon glyphicon-plus"></i> Add Child Node</a>
+							<a id="nav-edit-add" href="#"><i class="glyphicon glyphicon-plus"></i> Add Child Node</a>
 						</li>
 						<li>
-							<a href="#"><i class="glyphicon glyphicon-remove"></i> Delete Node</a>
+							<a id="nav-edit-remove" href="#"><i class="glyphicon glyphicon-remove"></i> Delete Node</a>
 						</li>
 					</ul>
 				</nav>
@@ -114,16 +127,15 @@
 		<script src="js/base64.js"></script>
 		
 		<script type="text/javascript">
-			$(function(exports) {
 				var _colors = {
-						blue : "#4169E1",
-						green : "#008000",
-						brown : "#A52A2A",
-						lightgreen : "#90EE90",
-						chocolate : "#D2691E",
-						sienna : "#A0522D",
-						peru : "#CD853F",
-						orange : "#FFA500"
+					blue : "#4169E1",
+					green : "#008000",
+					brown : "#A52A2A",
+					lightgreen : "#90EE90",
+					chocolate : "#D2691E",
+					sienna : "#A0522D",
+					peru : "#CD853F",
+					orange : "#FFA500"
 				};
 				var _datas = [{
 					id : "100001",
@@ -244,97 +256,247 @@
 					value : "1800.00tce",
 					pid : "100013"
 				}];
-	
-				var editing_info, editing_zoom, editing_pos;
-				var show_editbar = false;
-				var $editbar = $("#editbar");
-				var $chart_wrapper = $("#chart-content");
 				
-				var $chart = $("#chart");
-				$chart.orgchart({
-					width : 1000,
-					height : 1000,
-					rawDatas : _datas,
-					nodeclick : function(evt, info, node) {
-						show_editbar = true;
-						editing_info = info;
-						editing_zoom = $chart.data("orgchart").getZoom();
-						editing_pos = $chart.data("orgchart").getPosition();
-					}
-				});
+			var editing_info, editing_zoom, editing_pos;
+			var show_editbar = false;
 				
-				$chart.orgchart("draw", _datas);
-				$chart.width($(window).width());
-				$chart.height($(window).height() - 50);
+			var PhilViz = {
 				
-				$chart_wrapper.width($(window).width());
-				$chart_wrapper.height($(window).height() - 50);
-				
-				$(document).click(function() {
-					if (!show_editbar) {
-						$editbar.fadeTo(100, 0, function() {
-							// Animation complete.
-						});
-						$editbar.hide();
-					} else {
-						show_editbar = false;
-						$editbar.fadeTo(150, 0.9, function() {
-							// Animation complete.
-						});
-						$editbar.show();
-					}
-				});
-				
-				$('#btn-print').click(function() {
-					var container = $('#chart');
-					var svgImg = $('#chart svg');
-					var width = svgImg.width();
-					var height = svgImg.height();
-					if (width > 2550) {
-						width = 2550;
-						height = height / (width / 2550);
-						container.width(width);
-						container.height(height);
-						svgImg.width(width);
-						svgImg.height(height);
-					}
+				init: function(settings) {
+					PhilViz.config = {
+						editbar : $("#editbar"),
+						chart_wrapper : $("#chart-content"),
+						chart : $("#chart")
+					};
 					
-					canvg('canvas', container.html());
-					var canvas = document.getElementById("canvas")
-					var imgPNG = Canvas2Image.saveAsPNG(canvas, true)
-					$('#chart-png-container').html(imgPNG);
-					
- 					//var printWindow = window.open('', 'PrintMap', 'width=' + width + ',height=' + height);
-
-					var myWindow = window.open('','','width=500,height=500');
-					myWindow.document.write("<html><body onload='print();'><p>This is 'myWindow'</p>");
-					myWindow.document.write(imgPNG.attr('src') + "</body></html>");
-
-				});
+					$.extend(PhilViz.config, settings)
+					PhilViz.setup();
+				},
 				
-				// --- Edit Navbar Click Handlers ---
-				$('#nav-edit-edit').click(function() {
-					if (editing_info) {
-						$('#edit-text').val(editing_info.value);
-					} else {
-						$('#edit-text').val("");
-					}
+				setup: function() {
+					// Chart setup
+					PhilViz.config.chart.orgchart({
+						width : 1000,
+						height : 1000,
+						rawDatas : _datas,
+						nodeclick : function(evt, info, node) {
+							show_editbar = true;
+							editing_info = info;
+							editing_zoom = PhilViz.config.chart.data("orgchart").getZoom();
+							editing_pos = PhilViz.config.chart.data("orgchart").getPosition();
+						}
+					});
+					
+					PhilViz.config.chart.orgchart("draw", _datas);
+					PhilViz.config.chart.width($(window).width());
+					PhilViz.config.chart.height($(window).height() - 50);
+				
+					PhilViz.config.chart_wrapper.width($(window).width());
+					PhilViz.config.chart_wrapper.height($(window).height() - 50);
+					
+					PhilViz.setupClickHandlers();
+				}, 
+				
+				setupClickHandlers: function() {
+					$(document).click(function() {
+						if (!show_editbar) {
+							PhilViz.config.editbar.fadeTo(100, 0, function() {
+								// Animation complete.
+							});
+							PhilViz.config.editbar.hide();
+						} else {
+							show_editbar = false;
+							PhilViz.config.editbar.fadeTo(150, 0.9, function() {
+								// Animation complete.
+							});
+							PhilViz.config.editbar.show();
+						}
+					});
+					
+					$('#btn-print').click(function() {
+						var container = $('#chart');
+						var svgImg = $('#chart svg');
+						var width = svgImg.width();
+						var height = svgImg.height();
+						if (width > 2550) {
+							width = 2550;
+							height = height / (width / 2550);
+							container.width(width);
+							container.height(height);
+							svgImg.width(width);
+							svgImg.height(height);
+						}
+					
+						canvg('canvas', container.html());
+						var canvas = document.getElementById("canvas")
+						var imgPNG = Canvas2Image.saveAsPNG(canvas, true)
+						$('#chart-png-container').html(imgPNG);
+					
+						//var printWindow = window.open('', 'PrintMap', 'width=' + width + ',height=' + height);
+
+						var myWindow = window.open('','','width=500,height=500');
+						myWindow.document.write("<html><body onload='print();'><p>This is 'myWindow'</p>");
+						myWindow.document.write(imgPNG.attr('src') + "</body></html>");
+
+					});
+				
+					// --- Edit Navbar Click Handlers ---
+					$('#nav-edit-edit').click(function() {
+						if (editing_info) {
+							$('#edit-text').val(editing_info.value);
+							PhilViz.showEditEditor();
+						} else {
+							$('#edit-text').val("");
+						}
+					});
+				
+					$('#nav-edit-add').click(function() {
+						if (editing_info) {
+							PhilViz.showAddEditor();
+						} else {
+							$('#add-text').val("");
+						}
+					});
+				
+					$('#nav-edit-remove').click(function(e) {
+						if (editing_info) {
+							e.preventDefault();
+							if (window.confirm("Are you sure you want to remove this node? You will also lose any child nodes that exist.")) {
+								PhilViz.removeIndices(editing_info.id);
+							}
+						}
+					});
+				
+								
+					// --- AddBox Button Click Handlers ---
+					$('#add-save').click(function() {
+						if (editing_info) {
+							var new_node = {
+								id : PhilViz.generateUniqueID(),
+								name : "",
+								value : $('#add-text').val(),
+								pid : editing_info.id
+							};
+							_datas.push(new_node);
+							PhilViz.redrawChart();
+						} else {
+							alert("Error encountered - try again.");
+						}
+						PhilViz.hideAddEditor();
+					});
+					$('#add-close').click(function(e) {
+						if ($('#add-text').val() === "") {
+							e.preventDefault();
+							if (window.confirm("Are you sure you want to cancel? You will lose all your changes.")) {
+								PhilViz.hideAddEditor();
+							}
+						} else {
+							PhilViz.hideAddEditor();
+						}
+					});
+					$('#add-cancel').click(function(e) {
+						if ($('#edit-text').val() === "") {
+							e.preventDefault();
+							if (window.confirm("Are you sure you want to cancel? You will lose all your changes.")) {
+								PhilViz.hideAddEditor();
+							}
+						} else {
+							PhilViz.hideAddEditor();
+						}
+					});
+				
+					// --- EditBox Button Click Handlers ---
+					$('#edit-save').click(function() {					
+						for (var i = 0; i < _datas.length; i++) {
+							if (_datas[i].id === editing_info.id) {
+								_datas[i].value = $('#edit-text').val();
+								break;
+							}
+						}
+						PhilViz.redrawChart();
+						PhilViz.hideEditEditor();
+					});
+					$('#edit-close').click(function(e) {
+						if ($('#edit-text').val() !== editing_info.value) {
+							e.preventDefault();
+							if (window.confirm("Are you sure you want to cancel? You will lose all your changes.")) {
+								PhilViz.hideEditEditor();
+							}
+						} else {
+							PhilViz.hideEditEditor();
+						}
+					});
+					$('#edit-cancel').click(function(e) {
+						if ($('#edit-text').val() !== editing_info.value) {
+							e.preventDefault();
+							if (window.confirm("Are you sure you want to cancel? You will lose all your changes.")) {
+								PhilViz.hideEditEditor();
+							}
+						} else {
+							PhilViz.hideEditEditor();
+						}
+					});
+				},
+				
+				showAddEditor: function() {
+					$('#addbox').show();
+					$('#blackout').show();
+				},
+				
+				hideAddEditor: function() {
+					$('#addbox').hide();
+					$('#blackout').hide();
+					$('#add-text').val("");
+				},
+				
+				showEditEditor: function() {
 					$('#editbox').show();
 					$('#blackout').show();
-				});
+				},
 				
-				// --- EditBox Button Click Handlers ---
-				$('#edit-save').click(function() {					
+				hideEditEditor: function() {
+					$('#editbox').hide();
+					$('#blackout').hide();
+					$('#edit-text').val("");
+				},
+				
+				findIndicesToRemove: function(idToRemove) {
+					if (idToRemove < 0) {
+						return;
+					}
+					
+					var indicesToRemove = [];
 					for (var i = 0; i < _datas.length; i++) {
-						if (_datas[i].id === editing_info.id) {
-							_datas[i].value = $('#edit-text').val();
+						if (_datas[i].pid === idToRemove) {
+							indicesToRemove.push(i);
+							indicesToRemove.concat(PhilViz.findIndicesToRemove(_datas[i].id));
+						}
+					}
+					return indicesToRemove;
+				},
+				
+				removeIndices: function(idToRemove) {
+					if (idToRemove < 0) {
+						return;
+					}
+				
+					var indicesToRemove = PhilViz.findIndicesToRemove(idToRemove);
+					for (var i = 0; i < _datas.length; i++) {
+						if (_datas[i].id === idToRemove) {
+							indicesToRemove.push(i);
 							break;
 						}
 					}
-					
-					// Redraws 
-					$chart.data('orgchart').destory();
-					$chart.orgchart({
+					indicesToRemove.sort(function(a, b){return b - a});
+					for (var i = 0; i < indicesToRemove.length; i++) {
+						_datas.splice(indicesToRemove[i], 1);
+					}
+					PhilViz.redrawChart();
+				},
+				
+				redrawChart: function() {
+					PhilViz.config.chart.data('orgchart').destory();
+					PhilViz.config.chart.orgchart({
 						width : 1000,
 						height : 1000,
 						rawDatas : _datas,
@@ -344,44 +506,36 @@
 						nodeclick : function(evt, info, node) {
 							show_editbar = true;
 							editing_info = info;
-							editing_zoom = $chart.data("orgchart").getZoom();
-							editing_pos = $chart.data("orgchart").getPosition();
+							editing_zoom = PhilViz.config.chart.data("orgchart").getZoom();
+							editing_pos = PhilViz.config.chart.data("orgchart").getPosition();
 						}
 					});
+			
+					PhilViz.config.chart.orgchart("draw", _datas);
+					PhilViz.config.chart.width($(window).width());
+					PhilViz.config.chart.height($(window).height() - 50);
+				},
 				
-					$chart.orgchart("draw", _datas);
-					$chart.width($(window).width());
-					$chart.height($(window).height() - 50);
-					
-					// Hides Box
-					$('#editbox').hide();
-					$('#blackout').hide();
-				});
-				$('#edit-close').click(function(e) {
-					if ($('#edit-text').val() !== editing_info.value) {
-						e.preventDefault();
-						if (window.confirm("Are you sure you want to cancel? You will lose all your edits.")) {
-							$('#editbox').hide();
-							$('#blackout').hide();
+				generateUniqueID: function() {
+					var isUnique = false;
+					var newID = 0;
+					while (!isUnique) {
+						newID = Math.floor((Math.random() * 1000000) + 1);
+						var u = true;
+						for (var i = 0; i < _datas.length; i++) {
+							if (_datas[i].id === newID) {
+								u = false;
+							}  
+							if (u && i == (_datas.length - 1)) {
+								isUnique = true;
+							}
 						}
-					} else {
-						$('#editbox').hide();
-						$('#blackout').hide();
 					}
-				});
-				$('#edit-cancel').click(function(e) {
-					if ($('#edit-text').val() !== editing_info.value) {
-						e.preventDefault();
-						if (window.confirm("Are you sure you want to cancel? You will lose all your edits.")) {
-							$('#editbox').hide();
-							$('#blackout').hide();
-						}
-					} else {
-						$('#editbox').hide();
-						$('#blackout').hide();
-					}
-				});
-			});
+					return newID;
+				}
+			};
+			
+			$( document ).ready( PhilViz.init );
 		</script>
 	</body>
 </html>

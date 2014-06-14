@@ -80,7 +80,7 @@ svg rect[width="360"], svg text[fill="#00bee8"] {
 	opacity: 0.8;
 }
 
-.editbox {
+.editbox, .addbox {
 	display:none;
 	border-radius: 12px;
 	background:#FFF;
@@ -94,7 +94,7 @@ svg rect[width="360"], svg text[fill="#00bee8"] {
 	z-index: 9998;
 }
 
-.editbox-head {
+.editbox-head, .addbox-head {
 	border-radius: 12px 12px 0 0;
 	width: 100%;
 	height: 50px;
@@ -103,14 +103,14 @@ svg rect[width="360"], svg text[fill="#00bee8"] {
 	padding: 8px 0 0 16px;
 }
 
-.editbox-body {
+.editbox-body, .addbox-body {
 	border-radius: 0 0 12px 12px;
 	width: 100%;
 	color: #999;
 	padding: 16px;
 }
 
-.editbox-body p {
+.editbox-body p, .addbox-body p {
 	margin-top: 6px;
 }
 

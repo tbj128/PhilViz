@@ -41,17 +41,6 @@
 		return result;
 	}
 	
-	function determineTreeWidth(data, parentID, width) {
-		if (data) {
-			var width = 0;
-			$.each(data, function( index, value ) {
-				
-			});
-		} else {
-			return 0;
-		}
-	}
-	
 	function OrgNode(info, children) {
 		this.info = info;
 		this.children = (children && children.length) ? children : [];
@@ -155,7 +144,7 @@
 					var reasonCell = slf._paper.singleBox({
 						cx : center.x,
 						cy : center.y + 100,
-						text : "Reason",
+						text : "reason",
 						color : "#EBEBED",
 						fz : 10
 					});
@@ -187,8 +176,17 @@
 			var treeHeight = slf._determineTreeHeight(root);
 			console.log(treeWidth);
 			console.log(treeHeight);
-			ops.width = treeWidth * 320;
+			
+			ops.width = treeWidth * 360;
 			ops.height = treeHeight * 200;
+			
+			ops.width = (treeWidth + 3) * 400;
+			
+// 			if (treeWidth <= 6) {
+// 				ops.width = 8 * 400;
+// 			} else {
+// 				ops.width = (treeWidth + 3) * 400;
+// 			}
 			
 			if (ops.print) {
     			// Print mode
@@ -297,7 +295,7 @@
 			var slf = this;
 			if (!root) {
 				return 0;
-			} else if (root.children.length <= 0) {
+			} else if (root.children.length <= 1) {
 				return 0;
 			} else {
 				var childLengths = root.children.length;

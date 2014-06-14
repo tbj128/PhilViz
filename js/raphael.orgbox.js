@@ -14,7 +14,7 @@
  */
 ;(function(Raphael, $, String, undefined) {
 
-	var _black = "#000000", _white = "#FFFFFF", _blue = "#0000FF";
+	var _black = "#000000", _darkgrey = "#999999",_white = "#FFFFFF", _blue = "#0000FF";
 	
 	function isHalfEm(ch) {
 		return (/^[0-9a-z\(\)\.]$/g).test(ch);
@@ -168,51 +168,19 @@
 		var text1 = ops.text1, text2 = ops.text2;
 		var pref_len = Math.max(countEm(text1), countEm(text2)) + 1,
 			rect_h, rect_w;
-		
-		if(ops.vertical) {
-			rect_h = pref_len * fz;
-			rect_w = lh * fz;
-			nm_rect = paper.unirect({
-				x : cx - rect_w,
-				y : cy - 0.75 * rect_h,
-				width : rect_w,
-				height : rect_h,
-				color : color
-			});
-			nm_txt = paper.unitext({
-				x : cx - 0.5 * lh * fz,
-				y : cy,
-				text : text1,
-				fz : fz,
-				color : _white,
-				vertical : true
-			});
-			vl_rect = paper.unirect({
-				x : cx,
-				y : cy - 0.75 * rect_h,
-				width : rect_w,
-				height : rect_h
-			});
-			vl_txt = paper.unitext({
-				x : cx + 0.5 * lh * fz,
-				y : cy,
-				text : text2,
-				fz : fz,
-				color : color,
-				vertical : true
-			});
-		} else {
-			rect_w = pref_len * fz;
-			rect_w = 360;
-			rect_h = lh * fz;
-			rect_h = 64;
-			vl_rect = paper.unirect({
-				x : cx - 0.5 * rect_w,
-				y : cy - rect_h * 0.35 - 10, // TODO
-				width : rect_w,
-				height : rect_h,
-				color : color
-			});
+
+		rect_w = pref_len * fz;
+		rect_w = 360;
+		rect_h = lh * fz;
+		rect_h = 64;
+		vl_rect = paper.unirect({
+			x : cx - 0.5 * rect_w + 1,
+			y : cy - rect_h * 0.35 - 10, // TODO
+			width : rect_w - 2,
+			height : rect_h,
+			color : color
+		});
+// Future support for text in the upper box
 // 			nm_txt = paper.unitext({
 // 				x : cx,
 // 				y : cy - 0.5 * lh  * fz,
@@ -221,21 +189,21 @@
 // 				color : _white,
 // 				vertical : false
 // 			});
-			vl_rect = paper.unirect({
-				x : cx - 0.5 * rect_w,
-				y : cy - 20,
-				width : rect_w,
-				height : rect_h + 10
-			});
-			vl_txt = paper.unitext({
-				x : cx,
-				y : cy + 0.5 * lh  * fz + 10,
-				text : text2,
-				fz : fz + 4,
-				color : color,
-				vertical : false
-			});
-		}
+		vl_rect = paper.unirect({
+			x : cx - 0.5 * rect_w,
+			y : cy - 20,
+			width : rect_w,
+			height : rect_h + 10
+		});
+		vl_txt = paper.unitext({
+			x : cx,
+			y : cy + 0.5 * lh  * fz + 10,
+			text : text2,
+			fz : fz + 4,
+			color : color,
+			vertical : false
+		});
+		
 		var result = paper.set();
 		result.push(nm_rect, nm_txt, vl_rect, vl_txt);
 		return result;
@@ -278,7 +246,7 @@
 			y : cy,
 			text : text,
 			fz : fz,
-			color : _white,
+			color : _darkgrey,
 			vertical : vert
 		});
 		var result = paper.set();
