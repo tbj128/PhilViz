@@ -51,7 +51,19 @@
 				</p>
 			</div>
 		</div>
-
+		<div id="parent-addbox" class="addbox box-shadow">
+			<a href="#" id="parent-add-close" class="box-close-btn">Close</a>
+			<div class="addbox-head cfont">
+				Add Parent Node
+			</div>
+			<div class="addbox-body">
+				<textarea placeholder="Write the contents of the node..." id="parent-add-text" class="form-control" rows="5"></textarea>
+				<p>
+					<button id="parent-add-save" type="button" class="btn btn-success">Save</button>
+					<button id="parent-add-cancel" type="button" class="btn btn-primary">Cancel</button>
+				</p>
+			</div>
+		</div>
 	
 		<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
 			<div class="container">
@@ -91,6 +103,9 @@
 							<a id="nav-edit-edit" href="#"><i class="glyphicon glyphicon-edit"></i> Edit Node</a>
 						</li>
 						<li>
+							<a id="nav-edit-addparent" href="#" style="display:none;"><i class="glyphicon glyphicon-plus"></i> Add Parent Node</a>
+						</li>
+						<li>
 							<a id="nav-edit-add" href="#"><i class="glyphicon glyphicon-plus"></i> Add Child Node</a>
 						</li>
 						<li>
@@ -101,15 +116,43 @@
 			</div>
 		</div>
 		
+		<div id="welcome" class="welcome">
+			<a href="#" id="welcome-close" class="box-close-btn">Close</a>
+			<div class="welcome-head cfont">
+				<h1>Hi there. <small>Ready to make some diagrams?</small></h1>
+			</div>
+			<div class="welcome-body">
+				<div style="float:left;">
+					<br />
+					<p>
+						<button id="welcome-new" type="button" class="btn btn-default"><i class="glyphicon glyphicon-file"></i>&nbsp;&nbsp;New Diagram</button>
+					</p>
+					<button id="welcome-open" type="button" class="btn btn-default"><i class="glyphicon glyphicon-open"></i>&nbsp;&nbsp;Open Existing Diagram</button>
+					
+				</div>
+				<div style="float:right;">
+					<img src="img/sample.png" style="float:right;">
+				</div>
+				<div style="clear:both;padding-top:18px;">
+					<div style="float:left;width:92%">
+						<div class="alert alert-info"><strong>Tip&nbsp;&nbsp;</strong> Deleting a node will also delete any child nodes.</div>
+					</div>
+					<div style="float:right;width:6%">
+						<button type="button" class="btn btn-default"><i class="glyphicon glyphicon-question-sign"></i></button>
+					</div>
+				</div>
+			</div>
+		</div>
+		
 		<div id="chart-content" class="content-container" style="height:100%;position:relative;overflow:hidden;">
 			<div id="chart" style="width: 100%; margin: 0px;">
 			</div>
 		</div><!-- /.container -->
 		
-		<div id="chart-canvas-container">
+		<div id="chart-canvas-container" style="display:none;">
 			<canvas id="canvas" width="1000px" height="600px"></canvas> 
 		</div>
-		<div id="chart-png-container">
+		<div id="chart-png-container" style="display:none;">
 		</div>
 		
 		
@@ -259,11 +302,13 @@
 				
 			var editing_info, editing_zoom, editing_pos;
 			var show_editbar = false;
+			var editing_root_node = false;
 				
 			var PhilViz = {
 				
 				init: function(settings) {
 					PhilViz.config = {
+						show_welcome : true,
 						editbar : $("#editbar"),
 						chart_wrapper : $("#chart-content"),
 						chart : $("#chart")
@@ -274,6 +319,12 @@
 				},
 				
 				setup: function() {
+					// Welcome screen
+					if (PhilViz.config.show_welcome) {
+						$('#blackout').show();
+						$('#welcome').show();
+					}
+				
 					// Chart setup
 					PhilViz.config.chart.orgchart({
 						width : 1000,
@@ -282,6 +333,11 @@
 						nodeclick : function(evt, info, node) {
 							show_editbar = true;
 							editing_info = info;
+							if (info.pid === null) {
+								editing_root_node = true;
+							} else {
+								editing_root_node = false;
+							}
 							editing_zoom = PhilViz.config.chart.data("orgchart").getZoom();
 							editing_pos = PhilViz.config.chart.data("orgchart").getPosition();
 						}
@@ -309,6 +365,13 @@
 							PhilViz.config.editbar.fadeTo(150, 0.9, function() {
 								// Animation complete.
 							});
+							if (editing_root_node) {
+								$('#nav-edit-addparent').show();
+								$('#nav-edit-remove').hide();
+							} else {
+								$('#nav-edit-addparent').hide();
+								$('#nav-edit-remove').show();
+							}
 							PhilViz.config.editbar.show();
 						}
 					});
@@ -340,6 +403,22 @@
 
 					});
 				
+					// --- Welcome Click Handlers ---
+					$('#welcome-close').click(function() {
+						$('#welcome').hide();
+						$('#blackout').hide();
+					});
+					
+					$('#welcome-new').click(function() {
+						$('#welcome').hide();
+						$('#blackout').hide();
+					});
+					
+					$('#welcome-open').click(function() {
+						$('#welcome').hide();
+						$('#blackout').hide();
+					});
+					
 					// --- Edit Navbar Click Handlers ---
 					$('#nav-edit-edit').click(function() {
 						if (editing_info) {
@@ -347,6 +426,14 @@
 							PhilViz.showEditEditor();
 						} else {
 							$('#edit-text').val("");
+						}
+					});
+				
+					$('#nav-edit-addparent').click(function() {
+						if (editing_info) {
+							PhilViz.showAddParentEditor();
+						} else {
+							$('#parent-add-text').val("");
 						}
 					});
 				
@@ -404,7 +491,50 @@
 							PhilViz.hideAddEditor();
 						}
 					});
-				
+							
+					// --- Parent AddBox Button Click Handlers ---
+					$('#parent-add-save').click(function() {
+						if (editing_info) {
+							var new_node = {
+								id : PhilViz.generateUniqueID(),
+								name : "",
+								value : $('#parent-add-text').val(),
+								pid : null
+							};
+							for (var i = 0; i < _datas.length; i++) {
+								if (_datas[i].id === editing_info.id) {
+									_datas[i].pid = new_node.id;
+									break;
+								}
+							}
+							_datas.push(new_node);
+							PhilViz.redrawChart();
+						} else {
+							alert("Error encountered - try again.");
+						}
+						PhilViz.hideAddParentEditor();
+					});
+					$('#parent-add-close').click(function(e) {
+						if ($('#add-text').val() === "") {
+							e.preventDefault();
+							if (window.confirm("Are you sure you want to cancel? You will lose all your changes.")) {
+								PhilViz.hideAddParentEditor();
+							}
+						} else {
+							PhilViz.hideAddParentEditor();
+						}
+					});
+					$('#parent-add-cancel').click(function(e) {
+						if ($('#edit-text').val() === "") {
+							e.preventDefault();
+							if (window.confirm("Are you sure you want to cancel? You will lose all your changes.")) {
+								PhilViz.hideAddParentEditor();
+							}
+						} else {
+							PhilViz.hideAddParentEditor();
+						}
+					});
+					
 					// --- EditBox Button Click Handlers ---
 					$('#edit-save').click(function() {					
 						for (var i = 0; i < _datas.length; i++) {
@@ -436,6 +566,17 @@
 							PhilViz.hideEditEditor();
 						}
 					});
+				},
+				
+				showAddParentEditor: function() {
+					$('#parent-addbox').show();
+					$('#blackout').show();
+				},
+				
+				hideAddParentEditor: function() {
+					$('#parent-addbox').hide();
+					$('#blackout').hide();
+					$('#parent-add-text').val("");
 				},
 				
 				showAddEditor: function() {
@@ -479,19 +620,28 @@
 					if (idToRemove < 0) {
 						return;
 					}
-				
+					
+					var isRoot = false;
 					var indicesToRemove = PhilViz.findIndicesToRemove(idToRemove);
 					for (var i = 0; i < _datas.length; i++) {
 						if (_datas[i].id === idToRemove) {
 							indicesToRemove.push(i);
+							if (_datas[i].pid === null) {
+								isRoot = true;
+							}
 							break;
 						}
 					}
-					indicesToRemove.sort(function(a, b){return b - a});
-					for (var i = 0; i < indicesToRemove.length; i++) {
-						_datas.splice(indicesToRemove[i], 1);
+					
+					if (isRoot) {
+						
+					} else {
+						indicesToRemove.sort(function(a, b){return b - a});
+						for (var i = 0; i < indicesToRemove.length; i++) {
+							_datas.splice(indicesToRemove[i], 1);
+						}
+						PhilViz.redrawChart();
 					}
-					PhilViz.redrawChart();
 				},
 				
 				redrawChart: function() {
@@ -506,6 +656,11 @@
 						nodeclick : function(evt, info, node) {
 							show_editbar = true;
 							editing_info = info;
+							if (info.pid === null) {
+								editing_root_node = true;
+							} else {
+								editing_root_node = false;
+							}
 							editing_zoom = PhilViz.config.chart.data("orgchart").getZoom();
 							editing_pos = PhilViz.config.chart.data("orgchart").getPosition();
 						}

@@ -295,10 +295,13 @@
 			var slf = this;
 			if (!root) {
 				return 0;
-			} else if (root.children.length <= 1) {
+			} else if (root.children.length <= 0) {
 				return 0;
 			} else {
 				var childLengths = root.children.length;
+				if (childLengths == 1) {
+					childLengths = 0;
+				} 
 				$.each(root.children, function(i, value) {
 					childLengths += slf._determineTreeWidth(value);
 				});
