@@ -391,15 +391,10 @@
 				
 					$(document).click(function() {
 						if (!show_editbar) {
-							PhilViz.config.editbar.fadeTo(100, 0, function() {
-								// Animation complete.
-							});
-							PhilViz.config.editbar.hide();
+							PhilViz.config.editbar.fadeOut(50, function() {});
 						} else {
 							show_editbar = false;
-							PhilViz.config.editbar.fadeTo(150, 0.9, function() {
-								// Animation complete.
-							});
+							PhilViz.config.editbar.fadeIn(50, function() {});
 							if (editing_root_node) {
 								$('#nav-edit-addparent').show();
 								$('#nav-edit-remove').hide();
@@ -464,27 +459,28 @@
 					});
 
 					$('#nav-about').click(function() {
-						$('#aboutbox').show();
-						$('#blackout').show();
+						$('#aboutbox').fadeIn(50, function() {});
+						$('#blackout').fadeIn(50, function() {});
 					});
 					
 					$('#about-close').click(function() {
-						$('#aboutbox').hide();
-						$('#blackout').hide();
+						$('#aboutbox').fadeOut(50, function() {});
+						$('#blackout').fadeOut(50, function() {});
 					});
 				
 					// --- Welcome Click Handlers ---
 					$('#welcome-close').click(function() {
-						$('#welcome').hide();
-						$('#blackout').hide();
+						$('#welcome').fadeOut(50, function() {});
+						$('#blackout').fadeOut(50, function() {});
 					});
 					
 					$('#welcome-new').click(function() {
-						$('#welcome').hide();
-						$('#blackout').hide();
+						$('#welcome').fadeOut(100, function() {});
+						$('#blackout').fadeOut(100, function() {});
 					});
 					
 					$('#welcome-open').click(function() {
+						// TODO
 						$('#welcome').hide();
 						$('#blackout').hide();
 					});
@@ -639,35 +635,35 @@
 				},
 				
 				showAddParentEditor: function() {
-					$('#parent-addbox').show();
-					$('#blackout').show();
+					$('#blackout').fadeIn(50, function() {});
+					$('#parent-addbox').fadeIn(50, function() {});
 				},
 				
 				hideAddParentEditor: function() {
-					$('#parent-addbox').hide();
-					$('#blackout').hide();
+					$('#parent-addbox').fadeOut(50, function() {});
+					$('#blackout').fadeOut(50, function() {});
 					$('#parent-add-text').val("");
 				},
 				
 				showAddEditor: function() {
-					$('#addbox').show();
-					$('#blackout').show();
+					$('#blackout').fadeIn(50, function() {});
+					$('#addbox').fadeIn(50, function() {});
 				},
 				
 				hideAddEditor: function() {
-					$('#addbox').hide();
-					$('#blackout').hide();
+					$('#addbox').fadeOut(50, function() {});
+					$('#blackout').fadeOut(50, function() {});
 					$('#add-text').val("");
 				},
 				
 				showEditEditor: function() {
-					$('#editbox').show();
-					$('#blackout').show();
+					$('#blackout').fadeIn(50, function() {});
+					$('#editbox').fadeIn(50, function() {});
 				},
 				
 				hideEditEditor: function() {
-					$('#editbox').hide();
-					$('#blackout').hide();
+					$('#editbox').fadeOut(50, function() {});
+					$('#blackout').fadeOut(50, function() {});
 					$('#edit-text').val("");
 				},
 				
