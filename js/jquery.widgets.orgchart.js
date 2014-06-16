@@ -102,6 +102,7 @@
 			customPos : false,
 			initZoom : 0,
 			initPos : {},
+			isNew : false,
 			
 			isVert : function(level, info, node) {
 				return level > 3000;
@@ -264,7 +265,7 @@
 				if(_group.__free__.length === 1) {
 					rootid = _group.__free__[0][idKey];
 				} else {
-					var _free = {name:"根节点",value:""};
+					var _free = {name:"",value:""};
 					rootid = _free[idKey] = "__free__";
 					_free[pIdKey] = null;
 					
@@ -504,7 +505,7 @@
 			slf._paper.singleBox({
 				cx : ops.width / 2,
 				cy : ops.height / 2,
-				text : "等待数据填充...",
+				text : "",
 				fz : 20
 			});
 		},
@@ -522,7 +523,7 @@
 		},
 		
 		_randomColor : function() {
-			return "#00BEE8";
+			return "#3399CC";
 			// return "#" + _randomHex2() + _randomHex2() + _randomHex2();
 		},
 		

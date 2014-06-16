@@ -14,7 +14,7 @@
  */
 ;(function(Raphael, $, String, undefined) {
 
-	var _black = "#000000", _darkgrey = "#999999",_white = "#FFFFFF", _blue = "#0000FF";
+	var _black = "#000000", _darkgrey = "#CFCFCF",_white = "#FFFFFF", _blue = "#0000FF";
 	
 	function isHalfEm(ch) {
 		return (/^[0-9a-z\(\)\.]$/g).test(ch);
@@ -195,6 +195,11 @@
 			width : rect_w,
 			height : rect_h + 10
 		});
+		
+		if (text2 === "") {
+			text2 = "+ Click to edit this node...";
+			color = "#CFCFCF";
+		}
 		vl_txt = paper.unitext({
 			x : cx,
 			y : cy + 0.5 * lh  * fz + 10,

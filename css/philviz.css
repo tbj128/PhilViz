@@ -52,7 +52,7 @@ svg {
 	height: 100%;
 }
 
-svg rect[width="360"], svg text[fill="#00bee8"] {
+svg rect[width="360"], svg text {
 	cursor: pointer;
 }
 
