@@ -429,6 +429,10 @@
 					});
 					
 					$('#nav-save').click(function() {
+					var savedJSON = JSON.stringify(_datas);
+					var url = 'data:text/json;charset=utf8,' + encodeURIComponent(savedJSON);
+					window.open(url, '_blank');
+					window.focus();
 					});
 					
 					$('#nav-print').click(function() {
