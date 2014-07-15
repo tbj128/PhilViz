@@ -430,9 +430,15 @@
 					
 					$('#nav-save').click(function() {
 					var savedJSON = JSON.stringify(_datas);
-					var url = 'data:text/json;charset=utf8,' + encodeURIComponent(savedJSON);
-					window.open(url, '_blank');
-					window.focus();
+                    var savedFile = new Blob([savedJSON], {type: 'text/json'}),
+                    e = document.createEvent('MouseEvents'),
+                    a = document.createElement('a')
+					
+                    a.download = "PhilViz"
+                    a.href = window.URL.createObjectURL(savedFile)
+                    a.dataset.downloadurl =  ['text/json', a.download, a.href].join(':')
+                    e.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null)
+                    a.dispatchEvent(e)
 					});
 					
 					$('#nav-print').click(function() {
