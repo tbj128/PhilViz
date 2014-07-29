@@ -1,3 +1,18 @@
+<?php
+	
+	session_start();
+	
+	$new_upload = false;
+	$viz_file = "";
+	if (isset($_SESSION["new_upload"])) {
+		if ($_SESSION["new_upload"] === true) {
+			$new_upload = true;
+			$viz_file = $_SESSION["viz_file"];
+			$_SESSION["new_upload"] = false;
+		}
+	}
+?>
+
 <!DOCTYPE html>
 <html>
 	<head>
@@ -92,7 +107,7 @@
 						<span class="icon-bar"></span>
 						<span class="icon-bar"></span>
 					</button>
-					<a class="navbar-brand cfont clight" href="#">PhilViz<super>*</super></a>
+					<a class="navbar-brand cfont clight" href="index.php">PhilViz<super>*</super></a>
 				</div>
 				<nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
 					<ul class="nav navbar-nav">
@@ -176,6 +191,13 @@
 		<div id="chart-png-container" style="display:none;">
 		</div>
 		
+		<!-- Hidden form upload -->
+		<form id="open-file-form" action="open_viz.php" method="post" enctype="multipart/form-data">
+			<input type="file" id="open-file" name="viz_file" style="display: none;" />
+		</form>
+		<form id="save-file-form" action="save_viz.php" method="post">
+			<input type="text" id="save-file" name="viz_file" style="display: none;" />
+		</form>
 		
 		<!-- Required JS Scripts -->
 		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
@@ -201,12 +223,22 @@
 					peru : "#CD853F",
 					orange : "#FFA500"
 				};
-				var _datas = [{
-					id : "100001",
-					name : "",
-					value : "",
-					pid : null
-				}];
+				
+				<?php
+					if ($new_upload) {
+						echo 'var _datas =' . $viz_file . ';';
+					} else {
+				?>
+					var _datas = [{
+						id : "100001",
+						name : "",
+						value : "",
+						pid : null
+					}];
+				<?php
+					}
+				?>
+				
 				var _datas2 = [{
 					id : "100001",
 					name : "P4",
@@ -335,7 +367,17 @@
 				
 				init: function(settings) {
 					PhilViz.config = {
+						<?php 
+							if ($new_upload) {
+						?>
+						show_welcome : false,
+						<?php
+							} else {
+						?>
 						show_welcome : true,
+						<?php
+							}
+						?>
 						editbar : $("#editbar"),
 						chart_wrapper : $("#chart-content"),
 						chart : $("#chart")
@@ -426,19 +468,32 @@
 					});
 					
 					$('#nav-open').click(function() {
+						$("#open-file").click();
 					});
 					
-					$('#nav-save').click(function() {
-					var savedJSON = JSON.stringify(_datas);
-                    var savedFile = new Blob([savedJSON], {type: 'text/json'}),
-                    e = document.createEvent('MouseEvents'),
-                    a = document.createElement('a')
+					document.getElementById("open-file").onchange = function() {
+						if(!$("#open-file").val()) {
+						   // No file is uploaded, do not submit.
+						   // TODO
+						   return false;
+						} else {
+							document.getElementById("open-file-form").submit();
+						}
+					};
 					
-                    a.download = "PhilViz"
-                    a.href = window.URL.createObjectURL(savedFile)
-                    a.dataset.downloadurl =  ['text/json', a.download, a.href].join(':')
-                    e.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null)
-                    a.dispatchEvent(e)
+					$('#nav-save').click(function() {
+ 						var savedJSON = JSON.stringify(_datas);
+						$("#save-file").val(savedJSON);
+						$("#save-file-form").submit();			
+//                     var savedFile = new Blob([savedJSON], {type: 'text/json'}),
+//                     e = document.createEvent('MouseEvents'),
+//                     a = document.createElement('a')
+// 					
+//                     a.download = "PhilViz"
+//                     a.href = window.URL.createObjectURL(savedFile)
+//                     a.dataset.downloadurl =  ['text/json', a.download, a.href].join(':')
+//                     e.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null)
+//                     a.dispatchEvent(e)
 					});
 					
 					$('#nav-print').click(function() {
@@ -490,9 +545,7 @@
 					});
 					
 					$('#welcome-open').click(function() {
-						// TODO
-						$('#welcome').hide();
-						$('#blackout').hide();
+						$("#open-file").click();
 					});
 					
 					// --- Edit Navbar Click Handlers ---
