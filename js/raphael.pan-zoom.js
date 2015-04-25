@@ -85,6 +85,9 @@
                 initialPos = { x: 0, y: 0 },
                 deltaX = 0,
                 deltaY = 0,
+                prevZoomLevel = 0,
+                isDrag = false,
+                isZoom = false,
                 mousewheelevt = (/Firefox/i.test(navigator.userAgent)) ? "DOMMouseScroll" : "mousewheel";
 
             this.enabled = false;
@@ -99,6 +102,7 @@
             settings.initialZoom = options.initialZoom || 0;
             settings.initialPosition = options.initialPosition || { x: 0, y: 0 };
     
+            prevZoomLevel = settings.initialZoom;
             this.currZoom = settings.initialZoom;
             this.currPos = settings.initialPosition;
             
@@ -108,17 +112,27 @@
     
                 var newWidth = paper.width * (1 - (me.currZoom * settings.zoomStep)),
                     newHeight = paper.height * (1 - (me.currZoom * settings.zoomStep));
-    
+                
+                // These set the boundaries
                 if (me.currPos.x < 0) {
-                    me.currPos.x = 0;
-                } else if (me.currPos.x > (paper.width * me.currZoom * settings.zoomStep)) {
-                    me.currPos.x = (paper.width * me.currZoom * settings.zoomStep);
+                    //me.currPos.x = 0;
+                } else if (me.currPos.x > 2*(paper.width * me.currZoom * settings.zoomStep)) {
+                    //me.currPos.x = (paper.width * me.currZoom * settings.zoomStep);
                 }
-    
+                if (isZoom) {
+                    if (prevZoomLevel < me.currZoom) {
+                        // Zoom in
+                        me.currPos.x += ($(window).width() * me.currZoom * settings.zoomStep) / 3;
+                    } else {
+                        me.currPos.x -= ($(window).width() * me.currZoom * settings.zoomStep) / 3;
+                    }
+                    isZoom = false;
+                }
+
                 if (me.currPos.y < 0) {
-                    me.currPos.y = 0;
-                } else if (me.currPos.y > (paper.height * me.currZoom * settings.zoomStep)) {
-                    me.currPos.y = (paper.height * me.currZoom * settings.zoomStep);
+                    //me.currPos.y = 0;
+                } else if (me.currPos.y > 2*(paper.height * me.currZoom * settings.zoomStep)) {
+                    //me.currPos.y = (paper.height * me.currZoom * settings.zoomStep);
                 }
                 paper.setViewBox(me.currPos.x, me.currPos.y, newWidth, newHeight);
             }
@@ -132,9 +146,12 @@
                     newHeight = paper.height * (1 - (me.currZoom * settings.zoomStep)),
                     newPoint = getRelativePosition(evt, container);
     
-                deltaX = (newWidth * (newPoint.x - initialPos.x) / paper.width) * -1 * 3;
-                deltaY = (newHeight * (newPoint.y - initialPos.y) / paper.height) * -1 * 3;
+                deltaX = (newWidth * (newPoint.x - initialPos.x) / paper.width) * -1 * (9 * settings.zoomStep);
+                deltaY = (newHeight * (newPoint.y - initialPos.y) / paper.height) * -1 * (9 * settings.zoomStep);
+                deltaX = (newWidth * (newPoint.x - initialPos.x) / newWidth) * -1;
+                deltaY = (newHeight * (newPoint.y - initialPos.y) / newHeight) * -1;
                 initialPos = newPoint;
+                isDrag = true;
     
                 repaint();
                 me.dragTime += 1;
@@ -150,6 +167,7 @@
                 if (!me.enabled) {
                     return false;
                 }
+                prevZoomLevel = me.currZoom;
                 me.currZoom += val;
                 if (me.currZoom < settings.minZoom) {
                     me.currZoom = settings.minZoom;
@@ -160,7 +178,9 @@
     
                     deltaX = ((paper.width * settings.zoomStep) * (centerPoint.x / paper.width)) * val;
                     deltaY = (paper.height * settings.zoomStep) * (centerPoint.y / paper.height) * val;
-    
+                    
+                    isZoom = true;
+
                     repaint();
                 }
             }
@@ -180,7 +200,7 @@
                 } else if (delta < 0) {
                     delta = 1;
                 }
-                
+
                 applyZoom(delta, zoomCenter);
                 if (evt.preventDefault) {
                     evt.preventDefault();

@@ -172,10 +172,10 @@
 		rect_w = pref_len * fz;
 		rect_w = 360;
 		rect_h = lh * fz;
-		rect_h = 64;
+		rect_h = 84;
 		vl_rect = paper.unirect({
 			x : cx - 0.5 * rect_w + 1,
-			y : cy - rect_h * 0.35 - 10, // TODO
+			y : cy - rect_h * 0.35 - 30, // TODO
 			width : rect_w - 2,
 			height : rect_h,
 			color : color
@@ -191,18 +191,20 @@
 // 			});
 		vl_rect = paper.unirect({
 			x : cx - 0.5 * rect_w,
-			y : cy - 20,
+			y : cy - 48,
 			width : rect_w,
-			height : rect_h + 10
+			height : rect_h + 15
 		});
 		
 		if (text2 === "") {
-			text2 = "+ Click to edit this node...";
-			color = "#CFCFCF";
+			text2 = "+ Click to edit...";
+			color = "#a0a0a0";
+		} else {
+			color = "#5d5d5d";
 		}
 		vl_txt = paper.unitext({
 			x : cx,
-			y : cy + 0.5 * lh  * fz + 10,
+			y : cy + 0.5 * lh  * fz - 16,
 			text : text2,
 			fz : fz + 4,
 			color : color,

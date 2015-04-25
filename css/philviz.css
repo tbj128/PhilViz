@@ -49,6 +49,7 @@ h1 small {
 svg {
 	width: 100%;
 	height: 100%;
+	padding-top: 64px;
 }
 
 svg rect[width="360"], svg text {

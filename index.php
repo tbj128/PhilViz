@@ -121,11 +121,11 @@
 							<a id="nav-save" href="javascript:void(0);">Save</a>
 						</li>
 						<li>
-							<a id="nav-print" href="javascript:void(0);">Print</a>
+							<a id="nav-print" href="javascript:void(0);">Download SVG</a>
 						</li>
 					</ul>
 					<ul class="nav navbar-nav navbar-right">
-						<li><a id="nav-help" href="help.php" target="_blank">Help</a></li>
+						<!-- <li><a id="nav-help" href="help.php" target="_blank">Help</a></li>-->
 						<li><a id="nav-about" href="javascript:void(0);">About</a></li>
 					</ul>
 				</nav>
@@ -185,18 +185,21 @@
 			</div>
 		</div><!-- /.container -->
 		
-		<div id="chart-canvas-container" style="display:none;">
+		<!--<div id="chart-canvas-container" style="display:none;">
 			<canvas id="canvas" width="1000px" height="600px"></canvas> 
-		</div>
+		</div>-->
 		<div id="chart-png-container" style="display:none;">
 		</div>
 		
 		<!-- Hidden form upload -->
 		<form id="open-file-form" action="open_viz.php" method="post" enctype="multipart/form-data">
-			<input type="file" id="open-file" name="viz_file" style="display: none;" />
+			<input type="file" accept=".viz" id="open-file" name="viz_file" style="display: none;" />
 		</form>
 		<form id="save-file-form" action="save_viz.php" method="post">
 			<input type="text" id="save-file" name="viz_file" style="display: none;" />
+		</form>
+		<form id="download-file-form" action="download_viz.php" method="post">
+			<input type="text" id="download-file" name="viz_svg" style="display: none;" />
 		</form>
 		
 		<!-- Required JS Scripts -->
@@ -206,6 +209,7 @@
 		<script src="js/raphael.orgbox.js"></script>
 		<script src="js/jquery.widgets.orgchart.js"></script>
 		<script src="js/raphael.pan-zoom.js"></script>
+		<script src="js/philviz.js"></script>
 		<script type="text/javascript" src="http://canvg.googlecode.com/svn/trunk/rgbcolor.js"></script> 
 		<script type="text/javascript" src="http://canvg.googlecode.com/svn/trunk/StackBlur.js"></script>
 		<script type="text/javascript" src="http://canvg.googlecode.com/svn/trunk/canvg.js"></script> 
@@ -229,7 +233,7 @@
 						echo 'var _datas =' . $viz_file . ';';
 					} else {
 				?>
-					var _datas = [{
+					var _datas2 = [{
 						id : "100001",
 						name : "",
 						value : "",
@@ -239,7 +243,7 @@
 					}
 				?>
 				
-				var _datas2 = [{
+				var _datas = [{
 					id : "100001",
 					name : "P4",
 					value : "Infringing person's right to life may be done only competing right: <br />is someone else's right to control own body",
@@ -359,473 +363,19 @@
 					pid : "100013"
 				}];
 				
-			var editing_info, editing_zoom, editing_pos;
-			var show_editbar = false;
-			var editing_root_node = false;
-				
-			var PhilViz = {
-				
-				init: function(settings) {
-					PhilViz.config = {
-						<?php 
-							if ($new_upload) {
-						?>
-						show_welcome : false,
-						<?php
-							} else {
-						?>
-						show_welcome : true,
-						<?php
-							}
-						?>
-						editbar : $("#editbar"),
-						chart_wrapper : $("#chart-content"),
-						chart : $("#chart")
-					};
-					
-					$.extend(PhilViz.config, settings)
-					PhilViz.setup();
-				},
-				
-				setup: function() {
-					// Welcome screen
-					if (PhilViz.config.show_welcome) {
-						$('#blackout').show();
-						$('#welcome').show();
-					}
-				
-					// Chart setup
-					PhilViz.config.chart.orgchart({
-						width : 1000,
-						height : 1000,
-						rawDatas : _datas,
-						nodeclick : function(evt, info, node) {
-							show_editbar = true;
-							editing_info = info;
-							if (info.pid === null) {
-								editing_root_node = true;
-							} else {
-								editing_root_node = false;
-							}
-							editing_zoom = PhilViz.config.chart.data("orgchart").getZoom();
-							editing_pos = PhilViz.config.chart.data("orgchart").getPosition();
-						}
-					});
-					
-					PhilViz.config.chart.orgchart("draw", _datas);
-					PhilViz.config.chart.width($(window).width());
-					PhilViz.config.chart.height($(window).height() - 50);
-				
-					PhilViz.config.chart_wrapper.width($(window).width());
-					PhilViz.config.chart_wrapper.height($(window).height() - 50);
-					
-					PhilViz.setupClickHandlers();
-				}, 
-				
-				setupClickHandlers: function() {
-					$(window).bind('beforeunload', function() {
-						if (_datas) {
-							if (_datas.length > 1) {
-								return 'Are you sure you want to reload this page? You will lose all your work';
-							}
-						}
-					});
-				
-					$(document).click(function() {
-						if (!show_editbar) {
-							PhilViz.config.editbar.fadeOut(50, function() {});
-						} else {
-							show_editbar = false;
-							PhilViz.config.editbar.fadeIn(50, function() {});
-							if (editing_root_node) {
-								$('#nav-edit-addparent').show();
-								$('#nav-edit-remove').hide();
-							} else {
-								$('#nav-edit-addparent').hide();
-								$('#nav-edit-remove').show();
-							}
-							PhilViz.config.editbar.show();
-						}
-					});
-					
-					$('#nav-new').click(function(e) {
-						if (_datas) {
-							if (_datas.length > 1) {								
-								e.preventDefault();
-								if (window.confirm("Are you sure you want to start a new diagram? You will also lose any child nodes that exist.")) {
-									_datas = [
-										{
-											id : "100001",
-											name : "",
-											value : "",
-											pid : null
-										}
-									];
-									PhilViz.redrawChart(true);
-								}
-							}
-						}
-					});
-					
-					$('#nav-open').click(function() {
-						$("#open-file").click();
-					});
-					
-					document.getElementById("open-file").onchange = function() {
-						if(!$("#open-file").val()) {
-						   // No file is uploaded, do not submit.
-						   // TODO
-						   return false;
-						} else {
-							document.getElementById("open-file-form").submit();
-						}
-					};
-					
-					$('#nav-save').click(function() {
- 						var savedJSON = JSON.stringify(_datas);
-						$("#save-file").val(savedJSON);
-						$("#save-file-form").submit();			
-//                     var savedFile = new Blob([savedJSON], {type: 'text/json'}),
-//                     e = document.createEvent('MouseEvents'),
-//                     a = document.createElement('a')
-// 					
-//                     a.download = "PhilViz"
-//                     a.href = window.URL.createObjectURL(savedFile)
-//                     a.dataset.downloadurl =  ['text/json', a.download, a.href].join(':')
-//                     e.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null)
-//                     a.dispatchEvent(e)
-					});
-					
-					$('#nav-print').click(function() {
-						var container = $('#chart');
-						var svgImg = $('#chart svg');
-						var width = svgImg.width();
-						var height = svgImg.height();
-						if (width > 2550) {
-							width = 2550;
-							height = height / (width / 2550);
-							container.width(width);
-							container.height(height);
-							svgImg.width(width);
-							svgImg.height(height);
-						}
-					
-						canvg('canvas', container.html());
-						var canvas = document.getElementById("canvas")
-						var imgPNG = Canvas2Image.saveAsPNG(canvas, true)
-						$('#chart-png-container').html(imgPNG);
-					
-						//var printWindow = window.open('', 'PrintMap', 'width=' + width + ',height=' + height);
-
-						var myWindow = window.open('','','width=500,height=500');
-						myWindow.document.write("<html><body onload='print();'><p>This is 'myWindow'</p>");
-						myWindow.document.write(imgPNG.attr('src') + "</body></html>");
-
-					});
-
-					$('#nav-about').click(function() {
-						$('#aboutbox').fadeIn(50, function() {});
-						$('#blackout').fadeIn(50, function() {});
-					});
-					
-					$('#about-close').click(function() {
-						$('#aboutbox').fadeOut(50, function() {});
-						$('#blackout').fadeOut(50, function() {});
-					});
-				
-					// --- Welcome Click Handlers ---
-					$('#welcome-close').click(function() {
-						$('#welcome').fadeOut(50, function() {});
-						$('#blackout').fadeOut(50, function() {});
-					});
-					
-					$('#welcome-new').click(function() {
-						$('#welcome').fadeOut(100, function() {});
-						$('#blackout').fadeOut(100, function() {});
-					});
-					
-					$('#welcome-open').click(function() {
-						$("#open-file").click();
-					});
-					
-					// --- Edit Navbar Click Handlers ---
-					$('#nav-edit-edit').click(function() {
-						if (editing_info) {
-							$('#edit-text').val(editing_info.value);
-							PhilViz.showEditEditor();
-						} else {
-							$('#edit-text').val("");
-						}
-					});
-				
-					$('#nav-edit-addparent').click(function() {
-						if (editing_info) {
-							PhilViz.showAddParentEditor();
-						} else {
-							$('#parent-add-text').val("");
-						}
-					});
-				
-					$('#nav-edit-add').click(function() {
-						if (editing_info) {
-							PhilViz.showAddEditor();
-						} else {
-							$('#add-text').val("");
-						}
-					});
-				
-					$('#nav-edit-remove').click(function(e) {
-						if (editing_info) {
-							e.preventDefault();
-							if (window.confirm("Are you sure you want to remove this node? You will also lose any child nodes that exist.")) {
-								PhilViz.removeIndices(editing_info.id);
-							}
-						}
-					});
-				
-								
-					// --- AddBox Button Click Handlers ---
-					$('#add-save').click(function() {
-						if (editing_info) {
-							var new_node = {
-								id : PhilViz.generateUniqueID(),
-								name : "",
-								value : $('#add-text').val(),
-								pid : editing_info.id
-							};
-							_datas.push(new_node);
-							PhilViz.redrawChart();
-						} else {
-							alert("Error encountered - try again.");
-						}
-						PhilViz.hideAddEditor();
-					});
-					$('#add-close').click(function(e) {
-						if ($('#add-text').val() === "") {
-							e.preventDefault();
-							if (window.confirm("Are you sure you want to cancel? You will lose all your changes.")) {
-								PhilViz.hideAddEditor();
-							}
-						} else {
-							PhilViz.hideAddEditor();
-						}
-					});
-					$('#add-cancel').click(function(e) {
-						if ($('#edit-text').val() === "") {
-							e.preventDefault();
-							if (window.confirm("Are you sure you want to cancel? You will lose all your changes.")) {
-								PhilViz.hideAddEditor();
-							}
-						} else {
-							PhilViz.hideAddEditor();
-						}
-					});
-							
-					// --- Parent AddBox Button Click Handlers ---
-					$('#parent-add-save').click(function() {
-						if (editing_info) {
-							var new_node = {
-								id : PhilViz.generateUniqueID(),
-								name : "",
-								value : $('#parent-add-text').val(),
-								pid : null
-							};
-							for (var i = 0; i < _datas.length; i++) {
-								if (_datas[i].id === editing_info.id) {
-									_datas[i].pid = new_node.id;
-									break;
-								}
-							}
-							_datas.push(new_node);
-							PhilViz.redrawChart();
-						} else {
-							alert("Error encountered - try again.");
-						}
-						PhilViz.hideAddParentEditor();
-					});
-					$('#parent-add-close').click(function(e) {
-						if ($('#add-text').val() === "") {
-							e.preventDefault();
-							if (window.confirm("Are you sure you want to cancel? You will lose all your changes.")) {
-								PhilViz.hideAddParentEditor();
-							}
-						} else {
-							PhilViz.hideAddParentEditor();
-						}
-					});
-					$('#parent-add-cancel').click(function(e) {
-						if ($('#edit-text').val() === "") {
-							e.preventDefault();
-							if (window.confirm("Are you sure you want to cancel? You will lose all your changes.")) {
-								PhilViz.hideAddParentEditor();
-							}
-						} else {
-							PhilViz.hideAddParentEditor();
-						}
-					});
-					
-					// --- EditBox Button Click Handlers ---
-					$('#edit-save').click(function() {					
-						for (var i = 0; i < _datas.length; i++) {
-							if (_datas[i].id === editing_info.id) {
-								_datas[i].value = $('#edit-text').val();
-								break;
-							}
-						}
-						PhilViz.redrawChart();
-						PhilViz.hideEditEditor();
-					});
-					$('#edit-close').click(function(e) {
-						if ($('#edit-text').val() !== editing_info.value) {
-							e.preventDefault();
-							if (window.confirm("Are you sure you want to cancel? You will lose all your changes.")) {
-								PhilViz.hideEditEditor();
-							}
-						} else {
-							PhilViz.hideEditEditor();
-						}
-					});
-					$('#edit-cancel').click(function(e) {
-						if ($('#edit-text').val() !== editing_info.value) {
-							e.preventDefault();
-							if (window.confirm("Are you sure you want to cancel? You will lose all your changes.")) {
-								PhilViz.hideEditEditor();
-							}
-						} else {
-							PhilViz.hideEditEditor();
-						}
-					});
-				},
-				
-				showAddParentEditor: function() {
-					$('#blackout').fadeIn(50, function() {});
-					$('#parent-addbox').fadeIn(50, function() {});
-				},
-				
-				hideAddParentEditor: function() {
-					$('#parent-addbox').fadeOut(50, function() {});
-					$('#blackout').fadeOut(50, function() {});
-					$('#parent-add-text').val("");
-				},
-				
-				showAddEditor: function() {
-					$('#blackout').fadeIn(50, function() {});
-					$('#addbox').fadeIn(50, function() {});
-				},
-				
-				hideAddEditor: function() {
-					$('#addbox').fadeOut(50, function() {});
-					$('#blackout').fadeOut(50, function() {});
-					$('#add-text').val("");
-				},
-				
-				showEditEditor: function() {
-					$('#blackout').fadeIn(50, function() {});
-					$('#editbox').fadeIn(50, function() {});
-				},
-				
-				hideEditEditor: function() {
-					$('#editbox').fadeOut(50, function() {});
-					$('#blackout').fadeOut(50, function() {});
-					$('#edit-text').val("");
-				},
-				
-				findIndicesToRemove: function(idToRemove) {
-					if (idToRemove < 0) {
-						return;
-					}
-					
-					var indicesToRemove = [];
-					for (var i = 0; i < _datas.length; i++) {
-						if (_datas[i].pid === idToRemove) {
-							indicesToRemove.push(i);
-							indicesToRemove.concat(PhilViz.findIndicesToRemove(_datas[i].id));
-						}
-					}
-					return indicesToRemove;
-				},
-				
-				removeIndices: function(idToRemove) {
-					if (idToRemove < 0) {
-						return;
-					}
-					
-					var isRoot = false;
-					var indicesToRemove = PhilViz.findIndicesToRemove(idToRemove);
-					for (var i = 0; i < _datas.length; i++) {
-						if (_datas[i].id === idToRemove) {
-							indicesToRemove.push(i);
-							if (_datas[i].pid === null) {
-								isRoot = true;
-							}
-							break;
-						}
-					}
-					
-					if (isRoot) {
-						
-					} else {
-						indicesToRemove.sort(function(a, b){return b - a});
-						for (var i = 0; i < indicesToRemove.length; i++) {
-							_datas.splice(indicesToRemove[i], 1);
-						}
-						PhilViz.redrawChart();
-					}
-				},
-				
-				redrawChart: function(isNewChart) {
-					var newChart = false;
-					if (isNewChart) {
-						newChart = true;
-					}
-					
-					PhilViz.config.chart.data('orgchart').destory();
-					PhilViz.config.chart.orgchart({
-						width : 1000,
-						height : 1000,
-						rawDatas : _datas,
-						customPos : true,
-						initZoom : editing_zoom,
-						initPos : editing_pos,
-						isNew : newChart,
-						nodeclick : function(evt, info, node) {
-							show_editbar = true;
-							editing_info = info;
-							if (info.pid === null) {
-								editing_root_node = true;
-							} else {
-								editing_root_node = false;
-							}
-							editing_zoom = PhilViz.config.chart.data("orgchart").getZoom();
-							editing_pos = PhilViz.config.chart.data("orgchart").getPosition();
-						}
-					});
-			
-					PhilViz.config.chart.orgchart("draw", _datas);
-					PhilViz.config.chart.width($(window).width());
-					PhilViz.config.chart.height($(window).height() - 50);
-				},
-				
-				generateUniqueID: function() {
-					var isUnique = false;
-					var newID = 0;
-					while (!isUnique) {
-						newID = Math.floor((Math.random() * 1000000) + 1);
-						var u = true;
-						for (var i = 0; i < _datas.length; i++) {
-							if (_datas[i].id === newID) {
-								u = false;
-							}  
-							if (u && i == (_datas.length - 1)) {
-								isUnique = true;
-							}
-						}
-					}
-					return newID;
-				}
-			};
-			
-			$( document ).ready( PhilViz.init );
+			$( document ).ready( function() {
+	            <?php 
+	                if ($new_upload) {
+	            ?>
+				PhilViz.init(false);
+	            <?php
+	                } else {
+	            ?>
+				PhilViz.init(true);
+	            <?php
+	                }
+	            ?>
+			});
 		</script>
 	</body>
 </html>

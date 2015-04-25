@@ -182,6 +182,9 @@
 			ops.height = treeHeight * 200;
 			
 			ops.width = (treeWidth + 3) * 400;
+			if (ops.width < $(window).width()) {
+				ops.width = $(window).width();
+			}
 			
 // 			if (treeWidth <= 6) {
 // 				ops.width = 8 * 400;
@@ -192,7 +195,7 @@
 			if (ops.print) {
     			// Print mode
 				slf._paper = Raphael(dom, ops.width, ops.height);
-				slf._panZoom = slf._paper.panzoom({ initialZoom: 0, initialPosition: { x: 120, y: 70} });
+				slf._panZoom = slf._paper.panzoom({ initialZoom: 0, initialPosition: { x: 120, y: 20} });
 				slf._paper.setViewBox(ops.printX * (ops.width / ops.printXTot), ops.printY * (ops.height / ops.printYTot), ops.width / ops.printXTot, ops.height / ops.printYTot, false);
     		} else if (ops.customPos) {
     			// Custom start position mode
@@ -206,7 +209,7 @@
 				// Default mode
 				slf._paper = Raphael(dom, ops.width, ops.height);
 				// Use pan, zoom effects
-				slf._panZoom = slf._paper.panzoom({ initialZoom: 0, initialPosition: { x: 120, y: 70} });
+				slf._panZoom = slf._paper.panzoom({ initialZoom: 0, initialPosition: { x: 120, y: 20} });
 				
 				slf._panZoom.enable();
     			slf._paper.safari();
