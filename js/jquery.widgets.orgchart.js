@@ -172,11 +172,8 @@
 			var slf = this, dom = slf.element.get(0), ops = slf.options;
 			
 			var root = slf._buildTree(ops.rawDatas, null);
-			console.log(root);
 			var treeWidth = slf._determineTreeWidth(root);
 			var treeHeight = slf._determineTreeHeight(root);
-			console.log(treeWidth);
-			console.log(treeHeight);
 			
 			ops.width = treeWidth * 360;
 			ops.height = treeHeight * 200;

@@ -198,7 +198,7 @@
 		<form id="save-file-form" action="save_viz.php" method="post">
 			<input type="text" id="save-file" name="viz_file" style="display: none;" />
 		</form>
-		<form id="download-file-form" action="download_viz.php" method="post">
+		<form id="download-file-form" action="download_viz.php" method="post" target="_blank">
 			<input type="text" id="download-file" name="viz_svg" style="display: none;" />
 		</form>
 		
@@ -215,6 +215,7 @@
 		<script type="text/javascript" src="http://canvg.googlecode.com/svn/trunk/canvg.js"></script> 
 		<script src="js/canvas2image.js"></script>
 		<script src="js/base64.js"></script>
+		<script src="js/saveSvgAsPng.js"></script>
 		
 		<script type="text/javascript">
 				var _colors = {
@@ -233,7 +234,7 @@
 						echo 'var _datas =' . $viz_file . ';';
 					} else {
 				?>
-					var _datas2 = [{
+					var _datas = [{
 						id : "100001",
 						name : "",
 						value : "",
@@ -243,7 +244,7 @@
 					}
 				?>
 				
-				var _datas = [{
+				var _datas2 = [{
 					id : "100001",
 					name : "P4",
 					value : "Infringing person's right to life may be done only competing right: <br />is someone else's right to control own body",

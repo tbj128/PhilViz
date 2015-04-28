@@ -1,13 +1,17 @@
-<?php
-	if (isset($_POST["viz_svg"])) {
-		header("Content-Disposition: attachment; filename=\"diagram.png\"");
-		header("Content-Type: application/force-download");
-		header("Connection: close");
-		$image = new Imagick();
-		$image->readImageBlob($_POST["viz_svg"]);
-		$image->setImageFormat("png24");
-		$image->resizeImage(1024, 768, imagick::FILTER_LANCZOS, 1); 
+<!DOCTYPE html>
+<html>
+  <meta http-equiv="content-type" content="text/html; charset=UTF8">
 
-		echo $image;
-	}
-?>
+  <div id ="sandbox" style="visibility:hidden;">
+    <?php
+      echo $_POST["viz_svg"];
+    ?>
+  </div>
+
+  <script src="http://code.jquery.com/jquery-latest.js"></script>
+  <script src="js/saveSvgAsPng.js"></script>
+  <script>
+    var canvas = $('#sandbox').find('svg')[0];
+    saveSvgAsPng(canvas, 'diagram.png');
+  </script>
+</html>

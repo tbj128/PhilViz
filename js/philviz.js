@@ -14,7 +14,7 @@ var PhilViz = {
             chart : $("#chart")
         };
         
-        $.extend(PhilViz.config, settings)
+        $.extend(PhilViz.config, settings);
         PhilViz.setup();
     },
     
@@ -80,20 +80,10 @@ var PhilViz = {
         });
         
         $('#nav-new').click(function(e) {
-            if (_datas) {
-                if (_datas.length > 1) {                                
-                    e.preventDefault();
-                    if (window.confirm("Are you sure you want to start a new diagram? You will also lose any child nodes that exist.")) {
-                        _datas = [
-                            {
-                                id : "100001",
-                                name : "",
-                                value : "",
-                                pid : null
-                            }
-                        ];
-                        PhilViz.redrawChart(true);
-                    }
+            if (_datas) {                             
+                e.preventDefault();
+                if (window.confirm("Are you sure you want to start a new diagram? You will also lose any unsaved data.")) {
+                    location.reload();
                 }
             }
         });
@@ -120,26 +110,11 @@ var PhilViz = {
         });
         
         $('#nav-print').click(function() {
-            var container = $('#chart');
-            var saved = $(container).html();
-            isSave = true;
-            $("#download-file").val(saved);
+            var svg = $('#chart').find('svg')[0];
+            var serializer = new XMLSerializer();
+            var str = serializer.serializeToString(svg);
+            $("#download-file").val(str);
             $("#download-file-form").submit();
-
-            var popUpAndPrint = function() {
-                var container = $('#chart');
-                var svg = $('#chart svg');
-                var width = svg.width();
-                var height = svg.height();
-                var printWindow = window.open('', 'PrintMap',
-                'width=' + width + ',height=' + height);
-                printWindow.document.writeln($(container).html());
-                printWindow.document.close();
-                printWindow.print();
-                printWindow.close();
-            };
-            // The following doesn't work too well
-            //setTimeout(popUpAndPrint, 500);
         });
 
         $('#nav-about').click(function() {
@@ -400,7 +375,7 @@ var PhilViz = {
         
         PhilViz.config.chart.data('orgchart').destory();
         PhilViz.config.chart.orgchart({
-            width : 1000,
+            width : $(window).width(),
             height : 1000,
             rawDatas : _datas,
             customPos : true,
