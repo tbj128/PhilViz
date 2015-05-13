@@ -121,7 +121,7 @@
 							<a id="nav-save" href="javascript:void(0);">Save</a>
 						</li>
 						<li>
-							<a id="nav-print" href="javascript:void(0);">Download SVG</a>
+							<a id="nav-print" href="javascript:void(0);">Download Image</a>
 						</li>
 					</ul>
 					<ul class="nav navbar-nav navbar-right">
@@ -131,6 +131,7 @@
 				</nav>
 			</div>
 		</div>
+		
 		<div id="editbar" class="navbar navbar-inverse navbar-fixed-top navbar-secondary" role="navigation">
 			<div class="container">
 				<nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
